@@ -1,0 +1,15 @@
+{
+  "name": "international-lead-gen",
+  "version": "1.0.0",
+  "main": "international-leads-scraper.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node international-leads-scraper.mjs"
+  },
+  "dependencies": {
+    "axios": "^1.15.1",
+    "cheerio": "^1.2.0",
+    "csv-parse": "^6.2.1",
+    "csv-writer": "^1.6.0"
+  }
+}

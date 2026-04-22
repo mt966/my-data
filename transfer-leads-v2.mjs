@@ -1,0 +1,61 @@
+const newLeads = [
+  { "Name": "Italian Company Lubricants Spa", "Country": "Italy", "Website": "http://www.compagniaitalianalubrificanti.com", "Phone": "+39 02 345531", "Industry": "Lubricants" },
+  { "Name": "Società Internazionale Lubrificanti Spa", "Country": "Italy", "Website": "http://www.slilubricants.com/", "Phone": "+39 0143 677767", "Industry": "Lubricants" },
+  { "Name": "Klüber Lubrication Italia", "Country": "Italy", "Website": "https://www.klueber.com/it/it/", "Phone": "+39 02 982131", "Industry": "Lubricants" },
+  { "Name": "Lubra Spa", "Country": "Italy", "Website": "http://www.lubra.com/", "Phone": "+39 02 936 1171", "Industry": "Lubricants" },
+  { "Name": "Petronas Lubricants Italy Spa", "Country": "Italy", "Website": "http://www.arexons.com/", "Phone": "+39 390 292 4361", "Industry": "Lubricants" },
+  { "Name": "Gl Oil SPA", "Country": "Italy", "Website": "https://www.gloil.it/", "Phone": "+39 081 826 9629", "Industry": "Lubricants" },
+  { "Name": "M.A. Lubricants S.r.l.", "Country": "Italy", "Website": "http://www.malubricants.it/", "Phone": "+39 02 353 4144", "Industry": "Lubricants" },
+  { "Name": "Rilub S.P.A.", "Country": "Italy", "Website": "https://rilub.it/", "Phone": "+39 081 338 3411", "Industry": "Lubricants" },
+  { "Name": "Lubritex srl", "Country": "Italy", "Website": "http://www.lubritex.com/", "Phone": "+39 011 962 3011", "Industry": "Lubricants" },
+  { "Name": "AkzoNobel International Paint Korea", "Country": "South Korea", "Website": "http://www.akzonobel.com/", "Phone": "+82 55-585-3301", "Industry": "Paints" },
+  { "Name": "KCC corporation", "Country": "South Korea", "Website": "http://www.kccworld.co.kr/", "Phone": "+82 2-3480-5000", "Industry": "Paints" },
+  { "Name": "Samhwa Paints", "Country": "South Korea", "Website": "http://www.samhwa.com/", "Phone": "+82 31-499-0394", "Industry": "Paints" },
+  { "Name": "Noroo Paint & Coatings", "Country": "South Korea", "Website": "http://www.noroopaint.com/", "Phone": "+82 31-467-6114", "Industry": "Paints" },
+  { "Name": "Kangnam Jevisco", "Country": "South Korea", "Website": "http://www.jevisco.com/", "Phone": "+82 2-3270-0700", "Industry": "Paints" },
+  { "Name": "Pentekeu (Pentech)", "Country": "South Korea", "Website": "http://www.pentech.kr/", "Phone": "+82 32-572-7804", "Industry": "Paints" },
+  { "Name": "Dibsol", "Country": "South Korea", "Website": "N/A", "Phone": "+82 2-896-7333", "Industry": "Paints" },
+  { "Name": "Itiel", "Country": "South Korea", "Website": "N/A", "Phone": "+82 55-384-0891", "Industry": "Paints" },
+  { "Name": "May Tat Plastics Pte Ltd", "Country": "Singapore", "Website": "http://www.maytatplastics.com/", "Phone": "+65 6748 0616", "Industry": "Plastics" },
+  { "Name": "Laiwa Plastic & Paper Manufacturing", "Country": "Singapore", "Website": "http://laiwaplastic.com/", "Phone": "+65 6566 7478", "Industry": "Plastics" },
+  { "Name": "Singa Plastics Ltd", "Country": "Singapore", "Website": "https://www.singaplastics.com/", "Phone": "+65 6265 0922", "Industry": "Plastics" },
+  { "Name": "Asia Plastic Manufacturing", "Country": "Singapore", "Website": "http://www.asiaplastic.com.sg/", "Phone": "+65 6265 0885", "Industry": "Plastics" },
+  { "Name": "MAP Plastics Pte. Ltd.", "Country": "Singapore", "Website": "http://www.mapplastics.com/", "Phone": "+65 6745 6133", "Industry": "Plastics" },
+  { "Name": "Sin Tat Polyethylene", "Country": "Singapore", "Website": "http://www.sintat.com.sg/", "Phone": "+65 6265 2422", "Industry": "Plastics" },
+  { "Name": "Kay Kay Plastic Industries", "Country": "Singapore", "Website": "http://www.kaykay.com.sg/", "Phone": "+65 6261 1401", "Industry": "Plastics" },
+  { "Name": "Swees Engineering", "Country": "Singapore", "Website": "http://www.sweeseng.com.sg/", "Phone": "+65 6777 7586", "Industry": "Plastics" },
+  { "Name": "Sakurat Tech (S) Pte Ltd", "Country": "Singapore", "Website": "http://www.sakuratech.com/", "Phone": "+65 6266 5650", "Industry": "Plastics" },
+  { "Name": "Litaflex Plastics Manufacturing", "Country": "Singapore", "Website": "http://www.litaflex.com.sg/", "Phone": "+65 6752 4433", "Industry": "Plastics" },
+  { "Name": "Plastopia - China Injection Molding", "Country": "China", "Website": "http://www.plastopia.com/", "Phone": "+852 3075 6610", "Industry": "Plastics" },
+  { "Name": "Foodchem International Corporation", "Country": "China", "Website": "https://www.foodchem.cn/", "Phone": "+86 21 3126 7000", "Industry": "Plastics" },
+  { "Name": "Dow Chemical (China) Investment", "Country": "China", "Website": "http://www.dow.com/greaterchina/ch/", "Phone": "+86 21 3851 1000", "Industry": "Plastics" },
+  { "Name": "Saint-gobain Gaogongneng Plastics", "Country": "China", "Website": "https://www.saint-gobain.com.cn/plastics", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "DuPont China Holding Co., Ltd.", "Country": "China", "Website": "http://www.dupont.cn/", "Phone": "+86 21 3862 2888", "Industry": "Plastics" },
+  { "Name": "BASF Auxiliary Chemicals", "Country": "China", "Website": "http://www.basf.com/cn/", "Phone": "+86 21 3750 2100", "Industry": "Plastics" },
+  { "Name": "Covestro (Shanghai)", "Country": "China", "Website": "http://www.covestro.cn/", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "Evonik Specialty Chemicals", "Country": "China", "Website": "http://www.evonik.cn/", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "Kingfa Sci. & Tech. Co., Ltd.", "Country": "China", "Website": "http://www.kingfa.com.cn/", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "Shanghai Huayi Polymer Co., Ltd.", "Country": "China", "Website": "http://www.shhuayi.com/", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "Sinopec", "Country": "China", "Website": "http://www.sinopecgroup.com/", "Phone": "N/A", "Industry": "Plastics" },
+  { "Name": "PPG Industries Refinish France", "Country": "France", "Website": "https://fr.ppgrefinish.com/fr/", "Phone": "+33 1 41 47 23 00", "Industry": "Paints" },
+  { "Name": "BASF Coatings Division France", "Country": "France", "Website": "https://www.basf-coatings.com/", "Phone": "+33 1 34 32 51 00", "Industry": "Paints" },
+  { "Name": "SP Coating - Peinture Industrielle", "Country": "France", "Website": "N/A", "Phone": "+33 4 78 23 29 79", "Industry": "Paints" },
+  { "Name": "Prima Coating", "Country": "France", "Website": "https://www.primacoating.com/", "Phone": "+33 7 80 34 54 02", "Industry": "Paints" },
+  { "Name": "PPG Industries France", "Country": "France", "Website": "N/A", "Phone": "+33 3 27 19 35 00", "Industry": "Paints" },
+  { "Name": "AkzoNobel Powder Coatings", "Country": "France", "Website": "http://www.interpon.fr/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Sherwin-Williams France", "Country": "France", "Website": "http://www.sherwin-williams.com/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Axalta Coating Systems France", "Country": "France", "Website": "http://www.axalta.com/fr/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Becker Specialty Corporation", "Country": "France", "Website": "http://www.beckers-group.com/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Cromology", "Country": "France", "Website": "http://www.cromology.com/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Mader Group", "Country": "France", "Website": "http://www.mader-group.com/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Zolpan", "Country": "France", "Website": "http://www.zolpan.fr/", "Phone": "N/A", "Industry": "Paints" },
+  { "Name": "Hempel France", "Country": "France", "Website": "http://www.hempel.fr/", "Phone": "N/A", "Industry": "Paints" }
+];
+
+import fs from 'fs';
+
+const csvPath = 'international_industry_leads.csv';
+const csvData = newLeads.map(l => `"${l.Name}","${l.Country}","Verification Pending","${l.Phone}","${l.Industry}","${l.Website}"`).join('\n');
+fs.appendFileSync(csvPath, '\n' + csvData);
+
+console.log(`✅ Appended ${newLeads.length} leads from Europe & Asia.`);

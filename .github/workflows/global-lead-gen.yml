@@ -1,0 +1,47 @@
+name: Global Industry Lead Generation
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Runs every 6 hours
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  generate-leads:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/checked-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Global Search Sniper
+        run: node search-sniper.mjs
+        env:
+          NODE_ENV: production
+
+      - name: Run High-Speed Lead Scraper
+        run: node international-leads-scraper.mjs
+        env:
+          NODE_ENV: production
+
+      - name: Sync to Google Sheets
+        run: node sheets-sync.mjs
+        env:
+          GOOGLE_SHEETS_WEBHOOK: ${{ secrets.GOOGLE_SHEETS_WEBHOOK }}
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "LeadGenBot"
+          git config --global user.email "bot@github.com"
+          git add international_industry_leads.csv potential_leads.json synced_leads.json
+          git commit -m "Auto-Update: New industry leads found [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

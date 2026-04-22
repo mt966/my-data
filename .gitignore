@@ -1,0 +1,5 @@
+node_modules/
+*.log
+synced_leads.json
+potential_leads.json
+international_industry_leads.csv
