@@ -31,5 +31,7 @@ export const searchQueries = [
   "manufacturer export contact email",
   "chemical suppliers international email",
   "industry association member list",
+  "importer buyer list contact",
+  "wholesale chemicals distributor email",
   "top companies contact person email"
 ];

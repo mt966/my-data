@@ -18,17 +18,18 @@ if (fs.existsSync(POTENTIAL_LEADS_PATH)) {
 
 const existingWebsites = new Set(potentialLeads.map(l => l.website));
 
-async function harvestDomains(query, industry, country) {
-    console.log(`🔍 Searching: "${query}" in ${country}...`);
+async function harvestDomains(query, industry, country, page = 0) {
+    const offset = page * 10 + 1;
+    console.log(`🔍 Searching: "${query}" in ${country} (Page ${page + 1})...`);
     try {
-        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query + ' ' + country)}`;
+        const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query + ' ' + country)}&first=${offset}`;
         
         const res = await axios.get(searchUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
             },
-            timeout: 30000 // Increased timeout to 30 seconds
+            timeout: 30000
         });
 
         const $ = cheerio.load(res.data);
@@ -39,19 +40,28 @@ async function harvestDomains(query, industry, country) {
             let website = $(el).find('cite').first().text().trim() || $(el).find('.b_caption cite').text().trim();
             const snippet = $(el).find('.b_caption p, .b_lineclamp3, .b_algoSlug').text().toLowerCase();
             
-            // Clean website URL
             if (website) {
                 website = website.split(' ')[0].replace(' › ', '/');
                 if (!website.startsWith('http')) website = 'https://' + website;
+                
+                // Clean common suffixes and junk
+                website = website.replace(/[.,]$/, '');
             }
 
             if (website && !existingWebsites.has(website)) {
-                // Heuristic: Check if snippet looks like it belongs to a manufacturer/supplier
-                if (snippet.includes('company') || snippet.includes('manufacturer') || snippet.includes('supplier') || snippet.includes('industry')) {
+                const isRelevant = snippet.includes('company') || 
+                                 snippet.includes('manufacturer') || 
+                                 snippet.includes('supplier') || 
+                                 snippet.includes('industry') ||
+                                 snippet.includes('distributor') ||
+                                 snippet.includes('exporter') ||
+                                 snippet.includes('importer');
+
+                if (isRelevant) {
                     newLeads.push({
                         name: title.split(' - ')[0].split(' | ')[0].trim(),
                         country: country,
-                        website: website.startsWith('http') ? website : 'https://' + website,
+                        website: website,
                         industry: industry
                     });
                     existingWebsites.add(website);
@@ -61,7 +71,7 @@ async function harvestDomains(query, industry, country) {
 
         return newLeads;
     } catch (err) {
-        console.error(`   ❌ Search failed for [${query}]: ${err.message}`);
+        console.error(`   ❌ Search failed for [${query}] Page ${page+1}: ${err.message}`);
         return [];
     }
 }
@@ -73,22 +83,30 @@ async function startSniper() {
     const allIndustryItems = industries.flatMap(cat => cat.items);
     
     for (const industry of allIndustryItems) {
-        for (const country of targetCountries.slice(0, 5)) { // Start with top 5 countries for speed
+        for (const country of targetCountries) {
             for (const qBase of searchQueries) {
                 try {
                     const fullQuery = `${industry} ${qBase}`;
-                    const leads = await harvestDomains(fullQuery, industry, country);
                     
-                    if (leads.length > 0) {
-                        potentialLeads.push(...leads);
-                        console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country}.`);
-                        fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                    // Search first 3 pages for deeper results
+                    for (let page = 0; page < 3; page++) {
+                        const leads = await harvestDomains(fullQuery, industry, country, page);
+                        
+                        if (leads.length > 0) {
+                            potentialLeads.push(...leads);
+                            console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country} (Page ${page+1}).`);
+                            fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                        }
+                        
+                        // Small delay between pages
+                        await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
                     }
                 } catch (loopErr) {
                     console.error(`   ⚠️ Critical error in loop: ${loopErr.message}`);
                 }
                 
-                await new Promise(r => setTimeout(r, 8000 + Math.random() * 5000));
+                // Safety delay between different queries
+                await new Promise(r => setTimeout(r, 5000 + Math.random() * 3000));
             }
         }
     }
