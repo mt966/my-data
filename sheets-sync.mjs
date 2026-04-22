@@ -41,6 +41,12 @@ async function syncToSheets() {
 
     for (let i = 0; i < newRecords.length; i++) {
         const record = newRecords[i];
+        
+        // Skip malformed or empty records
+        if (!record['Company Name'] || !record['Email ID'] || record['Email ID'] === 'Verification Pending') {
+            continue;
+        }
+
         try {
             console.log(`   📤 Syncing: ${record['Company Name']}`);
             await axios.post(WEBHOOK_URL, record, {
