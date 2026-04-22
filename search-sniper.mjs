@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs';
-import path from 'fs'; // Wait, path is 'path'
 import { industries, targetCountries, searchQueries } from './industry-config.mjs';
 
 const POTENTIAL_LEADS_PATH = './potential_leads.json';
