@@ -11,10 +11,10 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -40,7 +40,7 @@ jobs:
           GOOGLE_SHEETS_WEBHOOK: ${{ secrets.GOOGLE_SHEETS_WEBHOOK }}
 
       - name: Upload Lead Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lead-generation-results
           path: |
