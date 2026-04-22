@@ -23,24 +23,36 @@ jobs:
 
       - name: Run Global Search Sniper
         run: node search-sniper.mjs
+        continue-on-error: true
         env:
           NODE_ENV: production
 
       - name: Run High-Speed Lead Scraper
         run: node international-leads-scraper.mjs
+        continue-on-error: true
         env:
           NODE_ENV: production
 
       - name: Sync to Google Sheets
         run: node sheets-sync.mjs
+        continue-on-error: true
         env:
           GOOGLE_SHEETS_WEBHOOK: ${{ secrets.GOOGLE_SHEETS_WEBHOOK }}
+
+      - name: Upload Lead Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lead-generation-results
+          path: |
+            international_industry_leads.csv
+            potential_leads.json
+            synced_leads.json
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name "LeadGenBot"
           git config --global user.email "bot@github.com"
-          git add international_industry_leads.csv potential_leads.json synced_leads.json
+          git add -f international_industry_leads.csv potential_leads.json synced_leads.json
           git commit -m "Auto-Update: New industry leads found [skip ci]" || echo "No changes to commit"
           git push
         env:

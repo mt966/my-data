@@ -73,21 +73,22 @@ async function startSniper() {
     const allIndustryItems = industries.flatMap(cat => cat.items);
     
     for (const industry of allIndustryItems) {
-        for (const country of targetCountries) {
+        for (const country of targetCountries.slice(0, 5)) { // Start with top 5 countries for speed
             for (const qBase of searchQueries) {
-                const fullQuery = `${industry} ${qBase}`;
-                const leads = await harvestDomains(fullQuery, industry, country);
-                
-                if (leads.length > 0) {
-                    potentialLeads.push(...leads);
-                    console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country}.`);
+                try {
+                    const fullQuery = `${industry} ${qBase}`;
+                    const leads = await harvestDomains(fullQuery, industry, country);
                     
-                    // Save incrementally to prevent data loss
-                    fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                    if (leads.length > 0) {
+                        potentialLeads.push(...leads);
+                        console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country}.`);
+                        fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                    }
+                } catch (loopErr) {
+                    console.error(`   ⚠️ Critical error in loop: ${loopErr.message}`);
                 }
                 
-                // Random delay to avoid search engine blocks
-                await new Promise(r => setTimeout(r, 5000 + Math.random() * 5000));
+                await new Promise(r => setTimeout(r, 8000 + Math.random() * 5000));
             }
         }
     }
