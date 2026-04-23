@@ -84,13 +84,13 @@ async function probeDeep(homepageUrl) {
 async function processBatch(batch) {
     return Promise.all(batch.map(async (lead) => {
         const { emails, phones } = await probeDeep(lead.website);
-        if (emails.length > 0) {
+        if (emails.length > 0 || phones.length > 0) {
             try {
                 await csvWriter.writeRecords([{
                     name: lead.name,
                     country: lead.country,
-                    email: emails.slice(0, 3).join('; '),
-                    phone: phones.slice(0, 2).join('; ') || 'N/A',
+                    email: emails.length > 0 ? emails.slice(0, 3).join('; ') : 'N/A',
+                    phone: phones.length > 0 ? phones.slice(0, 2).join('; ') : 'N/A',
                     industry: lead.industry,
                     website: lead.website
                 }]);
