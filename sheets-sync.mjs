@@ -43,7 +43,7 @@ async function syncToSheets() {
         const record = newRecords[i];
         
         // Skip malformed or empty records
-        if (!record['Company Name'] || !record['Email ID'] || record['Email ID'] === 'Verification Pending') {
+        if (!record['Company Name']) {
             continue;
         }
 
