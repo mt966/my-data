@@ -107,15 +107,15 @@ async function startSniper() {
     
     for (const industry of allIndustryItems) {
         for (const country of countriesToSearch) {
-            for (const qBase of searchQueries.slice(0, 1)) { // Only 1 query base
+            for (const qBase of searchQueries) { // Full query base
                 try {
                     const fullQuery = `${industry} ${qBase}`;
                     
-                    // Search 2 pages for depth
-                    for (let page = 0; page < 2; page++) {
+                    // Search first 5 pages for maximum depth
+                    for (let page = 0; page < 5; page++) {
                         const leads = await harvestDomains(fullQuery, industry, country, page);
                         
-                        if (leads.length > 0) {
+                        if (leads && leads.length > 0) {
                             potentialLeads.push(...leads);
                             console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country} (Page ${page+1}).`);
                             fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));

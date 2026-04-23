@@ -30,7 +30,6 @@ jobs:
       - name: Run Global Search Sniper
         run: |
           node search-sniper.mjs
-          ls -la
         continue-on-error: true
         env:
           NODE_ENV: production
@@ -38,7 +37,6 @@ jobs:
       - name: Run High-Speed Lead Scraper
         run: |
           node international-leads-scraper.mjs
-          ls -la
         continue-on-error: true
         env:
           NODE_ENV: production
@@ -46,7 +44,6 @@ jobs:
       - name: Sync to Google Sheets
         run: |
           node sheets-sync.mjs
-          ls -la
         continue-on-error: true
         env:
           GOOGLE_SHEETS_WEBHOOK: ${{ secrets.GOOGLE_SHEETS_WEBHOOK }}
