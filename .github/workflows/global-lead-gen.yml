@@ -52,7 +52,10 @@ jobs:
         run: |
           git config --global user.name "LeadGenBot"
           git config --global user.email "bot@github.com"
-          git add -f international_industry_leads.csv potential_leads.json synced_leads.json
+          # Only add files that actually exist
+          [ -f international_industry_leads.csv ] && git add -f international_industry_leads.csv || echo "CSV skip"
+          [ -f potential_leads.json ] && git add -f potential_leads.json || echo "JSON skip"
+          [ -f synced_leads.json ] && git add -f synced_leads.json || echo "Sync logs skip"
           git commit -m "Auto-Update: New industry leads found [skip ci]" || echo "No changes to commit"
           git push
         env:
