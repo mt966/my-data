@@ -90,21 +90,21 @@ function shuffle(array) {
 async function startSniper() {
     console.log('🎯 STARTING GLOBAL SEARCH SNIPER (BATCH MODE)...');
     
-    // Flatten industries
-    const allIndustryItems = industries.flatMap(cat => cat.items);
+    // Flatten industries - QUICK TEST: Only first item
+    const allIndustryItems = industries[0].items.slice(0, 1);
     
-    // Shuffle and pick 5 countries per run to avoid 6-hour timeout
-    const countriesToSearch = shuffle([...targetCountries]).slice(0, 5);
-    console.log(`🌍 Target countries for this run: ${countriesToSearch.join(', ')}`);
+    // QUICK TEST: Only 1 country
+    const countriesToSearch = shuffle([...targetCountries]).slice(0, 1);
+    console.log(`🧪 QUICK TEST MODE: Targeting ${countriesToSearch.join(', ')} for ${allIndustryItems[0]}`);
     
     for (const industry of allIndustryItems) {
         for (const country of countriesToSearch) {
-            for (const qBase of searchQueries) {
+            for (const qBase of searchQueries.slice(0, 1)) { // Only 1 query base
                 try {
                     const fullQuery = `${industry} ${qBase}`;
                     
-                    // Search first 2 pages for efficiency
-                    for (let page = 0; page < 2; page++) {
+                    // Search first 1 page for speed
+                    for (let page = 0; page < 1; page++) {
                         const leads = await harvestDomains(fullQuery, industry, country, page);
                         
                         if (leads.length > 0) {
@@ -113,15 +113,15 @@ async function startSniper() {
                             fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
                         }
                         
-                        // Small delay between pages
-                        await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
+                        // Very small delay for test
+                        await new Promise(r => setTimeout(r, 1000));
                     }
                 } catch (loopErr) {
                     console.error(`   ⚠️ Critical error in loop: ${loopErr.message}`);
                 }
                 
-                // Safety delay between queries
-                await new Promise(r => setTimeout(r, 5000 + Math.random() * 3000));
+                // Small safety delay for test
+                await new Promise(r => setTimeout(r, 2000));
             }
         }
     }
