@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 const CSV_PATH = path.join(process.cwd(), 'international_industry_leads.csv');
 const LEADS_JSON_PATH = path.join(process.cwd(), 'potential_leads.json');
 
+const fileExists = fs.existsSync(CSV_PATH);
 const csvWriter = createObjectCsvWriter({
   path: CSV_PATH,
   header: [
@@ -21,7 +22,7 @@ const csvWriter = createObjectCsvWriter({
     { id: 'industry', title: 'Industry' },
     { id: 'website', title: 'Website' },
   ],
-  append: true, 
+  append: fileExists, // If file exists, append. If not, write headers!
 });
 
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
