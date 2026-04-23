@@ -105,9 +105,21 @@ async function startSniper() {
     const countriesToSearch = ['USA', 'Germany', 'UAE'];
     console.log(`🧪 DEEP TEST MODE: Targeting ${countriesToSearch.join(', ')} for ${allIndustryItems.join(', ')}`);
     
+    const MAX_RUN_TIME_MS = 1.5 * 60 * 60 * 1000; // 1.5 hours
+    const startTime = Date.now();
+    let timeLimitReached = false;
+
     for (const industry of allIndustryItems) {
+        if (timeLimitReached) break;
         for (const country of countriesToSearch) {
+            if (timeLimitReached) break;
             for (const qBase of searchQueries) { // Full query base
+                if (Date.now() - startTime > MAX_RUN_TIME_MS) {
+                    console.log(`⏱️ Time limit of 1.5 hours reached. Stopping sniper gracefully to allow scraper to run...`);
+                    timeLimitReached = true;
+                    break;
+                }
+
                 try {
                     const fullQuery = `${industry} ${qBase}`;
                     
