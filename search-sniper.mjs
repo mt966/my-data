@@ -49,6 +49,14 @@ async function harvestDomains(query, industry, country, page = 0) {
             }
 
             if (website && !existingWebsites.has(website)) {
+                /*
+                const keywords = [industry, 'contact', 'email', 'manufacturer', 'supplier', 'exporter', 'importer', 'distributor', 'wholesale', 'buyer'];
+                const matchedKeywords = keywords.filter(kw => snippet.toLowerCase().includes(kw.toLowerCase()));
+        
+                // DEBUG: Relaxed filtering for test
+                // if (matchedKeywords.length < 2) return null;
+                */
+
                 const isRelevant = snippet.includes('company') || 
                                  snippet.includes('manufacturer') || 
                                  snippet.includes('supplier') || 
