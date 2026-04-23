@@ -76,20 +76,35 @@ async function harvestDomains(query, industry, country, page = 0) {
     }
 }
 
+// Helper to rotate countries
+function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+    while (currentIndex != 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
 async function startSniper() {
-    console.log('🎯 STARTING GLOBAL SEARCH SNIPER...');
+    console.log('🎯 STARTING GLOBAL SEARCH SNIPER (BATCH MODE)...');
     
     // Flatten industries
     const allIndustryItems = industries.flatMap(cat => cat.items);
     
+    // Shuffle and pick 5 countries per run to avoid 6-hour timeout
+    const countriesToSearch = shuffle([...targetCountries]).slice(0, 5);
+    console.log(`🌍 Target countries for this run: ${countriesToSearch.join(', ')}`);
+    
     for (const industry of allIndustryItems) {
-        for (const country of targetCountries) {
+        for (const country of countriesToSearch) {
             for (const qBase of searchQueries) {
                 try {
                     const fullQuery = `${industry} ${qBase}`;
                     
-                    // Search first 3 pages for deeper results
-                    for (let page = 0; page < 3; page++) {
+                    // Search first 2 pages for efficiency
+                    for (let page = 0; page < 2; page++) {
                         const leads = await harvestDomains(fullQuery, industry, country, page);
                         
                         if (leads.length > 0) {
@@ -105,7 +120,7 @@ async function startSniper() {
                     console.error(`   ⚠️ Critical error in loop: ${loopErr.message}`);
                 }
                 
-                // Safety delay between different queries
+                // Safety delay between queries
                 await new Promise(r => setTimeout(r, 5000 + Math.random() * 3000));
             }
         }
