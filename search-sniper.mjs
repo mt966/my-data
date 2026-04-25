@@ -49,20 +49,32 @@ async function harvestDomains(query, industry, country, page = 0) {
             }
 
                 if (website && !existingWebsites.has(website)) {
-                    let cName = title.split(/ - | \| |: /)[0].trim();
-                    // Fallback to domain name if title is generic or too long (e.g. blog post title)
-                    if (cName.toLowerCase().includes('home') || cName.length > 30) {
-                        try {
-                            cName = new URL(website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
-                        } catch(e) { cName = "Unknown"; }
+                    
+                    // --- B2C BLACKLIST (Reject Retail Stores & Directories) ---
+                    const b2cBlacklist = ['amazon', 'walmart', 'target', 'ebay', 'alibaba', 'aliexpress', 'indiamart', 'tradeindia', 'homedepot', 'lowes', 'sephora', 'ulta', 'macys', 'cvs', 'walgreens', 'sherwin-williams', 'behr', 'menards', 'acehardware', 'flipkart', 'shopee', 'lazada', 'jd.com', 'taobao', 'wayfair', 'bestbuy', 'costco', 'nordstrom', 'maccosmetics', 'dir.indiamart', 'europages', 'justdial'];
+                    
+                    let isBlacklisted = false;
+                    try {
+                        let domainStr = new URL(website).hostname.toLowerCase();
+                        isBlacklisted = b2cBlacklist.some(bad => domainStr.includes(bad));
+                    } catch(e) {}
+
+                    if (!isBlacklisted) {
+                        let cName = title.split(/ - | \| |: /)[0].trim();
+                        // Fallback to domain name if title is generic or too long (e.g. blog post title)
+                        if (cName.toLowerCase().includes('home') || cName.length > 30) {
+                            try {
+                                cName = new URL(website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
+                            } catch(e) { cName = "Unknown"; }
+                        }
+                        newLeads.push({
+                            name: cName,
+                            country: country,
+                            website: website,
+                            industry: industry
+                        });
+                        existingWebsites.add(website);
                     }
-                    newLeads.push({
-                        name: cName,
-                        country: country,
-                        website: website,
-                        industry: industry
-                    });
-                    existingWebsites.add(website);
                 }
         });
 

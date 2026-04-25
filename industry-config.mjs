@@ -28,10 +28,10 @@ export const targetCountries = [
 ];
 
 export const searchQueries = [
-  "manufacturer export contact email",
-  "chemical suppliers international email",
-  "industry association member list",
-  "importer buyer list contact",
-  "wholesale chemicals distributor email",
-  "top companies contact person email"
+  "manufacturer factory raw material procurement",
+  "manufacturing plant b2b purchasing contact",
+  "wholesale chemical additives buyer email",
+  "production facility chemical supplier directory",
+  "industrial grade bulk buyer import",
+  "chemicals procurement manager email"
 ];

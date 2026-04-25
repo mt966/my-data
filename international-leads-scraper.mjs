@@ -26,7 +26,6 @@ const csvWriter = createObjectCsvWriter({
 });
 
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-const PHONE_REGEX = /(\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9})/g;
 
 async function probeDeep(homepageUrl) {
   try {
@@ -44,7 +43,7 @@ async function probeDeep(homepageUrl) {
     const $ = cheerio.load(html);
     
     let emails = new Set(html.match(EMAIL_REGEX) || []);
-    let phones = new Set(html.match(PHONE_REGEX) || []);
+    let phones = new Set(); // ONLY relying on 'tel:' for 100% strict accuracy
 
     const subLinks = [];
     $('a').each((i, el) => {
@@ -75,7 +74,6 @@ async function probeDeep(homepageUrl) {
         const sRes = await axios.get(sub, { timeout: 12000, headers: { 'User-Agent': 'Mozilla/5.0' }, validateStatus: false });
         if (sRes.status < 400) {
             (sRes.data.match(EMAIL_REGEX) || []).forEach(e => emails.add(e));
-            (sRes.data.match(PHONE_REGEX) || []).forEach(p => phones.add(p));
         }
       } catch {}
     }
@@ -85,9 +83,10 @@ async function probeDeep(homepageUrl) {
       return !isImage && e.length < 50 && !e.includes('example.com') && !e.includes('yourdomain.com');
     });
 
+    // We already cleaned phones during the tel: extraction, just ensure valid length
     const cleanPhones = [...phones].filter(p => {
         const digits = p.replace(/\D/g, '');
-        if (digits.length < 10 || digits.length > 15) return false;
+        if (digits.length < 8 || digits.length > 15) return false;
         if (/^(\d)\1+$/.test(digits)) return false;
         if (digits === '1234567890' || digits === '0123456789') return false;
         return true;
@@ -120,11 +119,14 @@ async function processBatch(batch) {
             }
 
             try {
+                const finalEmail = emails.length > 0 ? "'" + emails.slice(0, 3).join('; ') : 'N/A';
+                const finalPhone = phones.length > 0 ? "'" + phones.slice(0, 2).join('; ') : 'N/A';
+                
                 await csvWriter.writeRecords([{
                     name: finalName,
                     country: lead.country,
-                    email: emails.length > 0 ? emails.slice(0, 3).join('; ') : 'N/A',
-                    phone: phones.length > 0 ? phones.slice(0, 2).join('; ') : 'N/A',
+                    email: finalEmail,
+                    phone: finalPhone,
                     industry: lead.industry,
                     website: lead.website
                 }]);
