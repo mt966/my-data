@@ -35,6 +35,11 @@ async function harvestDomains(query, industry, country, page = 0) {
         const $ = cheerio.load(res.data);
         const newLeads = [];
 
+        if ($('.b_algo').length === 0) {
+            console.log(`   ⚠️ No results or blocked by Bing. Breaking pagination.`);
+            return null; // Signal to break pagination loop
+        }
+
         $('.b_algo').each((i, el) => {
             const title = $(el).find('h2').text().trim();
             let website = $(el).find('cite').first().text().trim() || $(el).find('.b_caption cite').text().trim();
@@ -105,7 +110,8 @@ async function startSniper() {
     const countriesToSearch = shuffle([...targetCountries]);
     console.log(`🎯 TARGETING: ${countriesToSearch.length} Countries for ${allIndustryItems.length} Industries`);
     
-    const MAX_RUN_TIME_MS = 1.5 * 60 * 60 * 1000; // 1.5 hours
+    // REDUCED SNIPER TIME TO 30 MINUTES to allow the scraper to process the massive backlog
+    const MAX_RUN_TIME_MS = 30 * 60 * 1000; 
     const startTime = Date.now();
     let timeLimitReached = false;
 
@@ -128,10 +134,14 @@ async function startSniper() {
                     for (let page = 0; page < 5; page++) {
                         const leads = await harvestDomains(fullQuery, industry, country, page);
                         
+                        if (leads === null) break; // Bing blocked or no more results, stop paginating!
+
                         if (leads && leads.length > 0) {
                             potentialLeads.push(...leads);
                             console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country} (Page ${page+1}).`);
                             fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                        } else if (leads && leads.length === 0) {
+                            break; // Empty page, no more results
                         }
                         
                         // Small delay between pages
