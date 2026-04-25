@@ -96,8 +96,23 @@ async function harvestDomains(query, industry, country, page = 0) {
                         const lowSnippet = snippet.toLowerCase();
                         
                         // --- RELEVANCE FILTER (Only Factory/B2B/Procurement) ---
-                        const b2bKeywords = ['factory', 'plant', 'manufacturer', 'procurement', 'wholesale', 'supplier', 'chemical', 'industrial', 'bulk', 'import', 'distributor', 'purchasing', 'buyer', 'production'];
-                        const junkKeywords = ['news', 'sport', 'league', 'goal', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'price-list', 'retail'];
+                        const b2bKeywords = [
+                          'factory', 'plant', 'manufacturer', 'supplier', 'distributor',
+                          'wholesale', 'industrial', 'chemical', 'chemicals',
+                          'export', 'exporter', 'trading', 'trader',
+                          'bulk', 'import', 'buyer', 'procurement',
+                          'production', 'materials', 'solutions',
+                          'lubricant', 'coating', 'polymer', 'resin'
+                        ];
+                        
+                        const junkKeywords = [
+                          'news', 'sport', 'league', 'score', 'results',
+                          'weather', 'movie', 'song', 'lyrics',
+                          'blog', 'forum', 'wiki', 'magazine',
+                          'newspaper', 'review', 'retail', 'price-list',
+                          'youtube', 'facebook', 'instagram', 'linkedin',
+                          'amazon', 'flipkart', 'ebay', 'pdf', 'download'
+                        ];
                         
                         const hasB2B = b2bKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
                         const hasJunk = junkKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
