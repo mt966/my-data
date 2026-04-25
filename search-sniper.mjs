@@ -93,9 +93,6 @@ async function harvestDomains(query, industry, country, page = 0) {
                     const industryKeywords = ['lubricant', 'grease', 'coating', 'paint', 'polymer', 'resin', 'rubber', 'adhesive', 'printing ink', 'candle', 'cosmetic', 'textile processing', 'leather processing', 'packaging', 'pharmaceutical', 'construction chemical', 'factory', 'plant', 'manufacturer', 'supplier', 'distributor'];
                     const junkKeywords = ['news', 'sport', 'league', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'retail', 'price-list', 'pdf', 'download', 'youtube', 'facebook', 'instagram', 'linkedin'];
 
-                    const lowTitle = title.toLowerCase();
-                    const lowSnippet = snippet.toLowerCase();
-
                     // VVIP Scoring (+10) - Instant Winner
                     vvipKeywords.forEach(kw => {
                         if (lowTitle.includes(kw) || lowSnippet.includes(kw)) score += 10;
