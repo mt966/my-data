@@ -12,12 +12,9 @@ const SCRAPED_DOMAINS_PATH = './scraped_domains.json';
 
 // Load existing leads to avoid duplicates
 let potentialLeads = [];
+// FORCE CLEAR JUNK DATA: We start fresh with strict B2B rules
 if (fs.existsSync(POTENTIAL_LEADS_PATH)) {
-    try {
-        potentialLeads = JSON.parse(fs.readFileSync(POTENTIAL_LEADS_PATH, 'utf8'));
-    } catch (e) {
-        potentialLeads = [];
-    }
+    fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify([], null, 2));
 }
 
 const existingWebsites = new Set(potentialLeads.map(l => l.website));
@@ -95,6 +92,26 @@ async function harvestDomains(query, industry, country, page = 0) {
                     } catch(e) {}
 
                     if (!isBlacklisted) {
+                        const lowTitle = title.toLowerCase();
+                        const lowSnippet = snippet.toLowerCase();
+                        
+                        // --- RELEVANCE FILTER (Only Factory/B2B/Procurement) ---
+                        const b2bKeywords = ['factory', 'plant', 'manufacturer', 'procurement', 'wholesale', 'supplier', 'chemical', 'industrial', 'bulk', 'import', 'distributor', 'purchasing', 'buyer', 'production'];
+                        const junkKeywords = ['news', 'sport', 'league', 'goal', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'price-list', 'retail'];
+                        
+                        const hasB2B = b2bKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
+                        const hasJunk = junkKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
+                        
+                        // Strict check: Must have B2B signals and NO junk signals
+                        if (!hasB2B && !lowTitle.includes(industry.toLowerCase().split(' ')[0])) {
+                            console.log(`      ⏩ Skipping non-B2B title: "${title}"`);
+                            return;
+                        }
+                        if (hasJunk) {
+                            console.log(`      ⏩ Skipping Junk/News: "${title}"`);
+                            return;
+                        }
+
                         let cName = title.split(/ - | \| |: /)[0].trim();
                         // Fallback to domain name if title is generic or too long (e.g. blog post title)
                         if (cName.toLowerCase().includes('home') || cName.length > 30) {
