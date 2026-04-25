@@ -66,8 +66,12 @@ async function harvestDomains(query, industry, country, page = 0) {
                                  snippet.includes('importer');
 
                 if (isRelevant) {
+                    let cName = title.split(' - ')[0].split(' | ')[0].trim();
+                    if (cName.toLowerCase() === 'home' || cName.toLowerCase() === 'home page') {
+                        cName = title.split(' - ')[1]?.trim() || title.split(' | ')[1]?.trim() || new URL(website).hostname.replace('www.', '').split('.')[0].toUpperCase();
+                    }
                     newLeads.push({
-                        name: title.split(' - ')[0].split(' | ')[0].trim(),
+                        name: cName,
                         country: country,
                         website: website,
                         industry: industry
@@ -97,13 +101,12 @@ function shuffle(array) {
 
 async function startSniper() {
     console.log('🎯 STARTING GLOBAL SEARCH SNIPER (BATCH MODE)...');
+    // Flatten industries
+    const allIndustryItems = industries.flatMap(c => c.items);
     
-    // Flatten industries - DEEP TEST: Top 3 categories
-    const allIndustryItems = ['Lubricants & Grease', 'Paints & Coatings', 'Plastics & Polymer'];
-    
-    // DEEP TEST: 3 Major Markets
-    const countriesToSearch = ['USA', 'Germany', 'UAE'];
-    console.log(`🧪 DEEP TEST MODE: Targeting ${countriesToSearch.join(', ')} for ${allIndustryItems.join(', ')}`);
+    // FULL PRODUCTION: All countries
+    const countriesToSearch = targetCountries;
+    console.log(`🎯 TARGETING: ${countriesToSearch.length} Countries for ${allIndustryItems.length} Industries`);
     
     const MAX_RUN_TIME_MS = 1.5 * 60 * 60 * 1000; // 1.5 hours
     const startTime = Date.now();
