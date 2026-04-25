@@ -85,30 +85,47 @@ async function harvestDomains(query, industry, country, page = 0) {
                     const lowTitle = title.toLowerCase();
                     const lowSnippet = snippet.toLowerCase();
                     
-                    // --- SMART SCORING SYSTEM (Replaces Strict Reject) ---
+                    // --- CHEMICAL SPECIALIST SCORING SYSTEM (User's Elite List) ---
                     let score = 0;
-                    const b2bKeywords = ['factory', 'plant', 'manufacturer', 'supplier', 'distributor', 'wholesale', 'industrial', 'chemical', 'chemicals', 'export', 'exporter', 'trading', 'trader', 'bulk', 'import', 'buyer', 'procurement', 'production', 'materials', 'solutions', 'lubricant', 'coating', 'polymer', 'resin'];
-                    const junkKeywords = ['news', 'sport', 'league', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'retail', 'price-list', 'pdf', 'download'];
                     
-                    // Score for B2B signals
-                    b2bKeywords.forEach(kw => {
+                    const vvipKeywords = ['hydrogenated castor oil', 'castor wax', '12 hydroxy stearic acid', 'hco', 'oleochemical', 'fatty acid'];
+                    const highIntentKeywords = ['thickener', 'lubricant additive', 'coating additive', 'processing aid', 'stabilizer', 'binding agent', 'importer', 'buyer', 'procurement', 'bulk', 'wholesale'];
+                    const industryKeywords = ['lubricant', 'grease', 'coating', 'paint', 'polymer', 'resin', 'rubber', 'adhesive', 'printing ink', 'candle', 'cosmetic', 'textile processing', 'leather processing', 'packaging', 'pharmaceutical', 'construction chemical', 'factory', 'plant', 'manufacturer', 'supplier', 'distributor'];
+                    const junkKeywords = ['news', 'sport', 'league', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'retail', 'price-list', 'pdf', 'download', 'youtube', 'facebook', 'instagram', 'linkedin'];
+
+                    const lowTitle = title.toLowerCase();
+                    const lowSnippet = snippet.toLowerCase();
+
+                    // VVIP Scoring (+10) - Instant Winner
+                    vvipKeywords.forEach(kw => {
+                        if (lowTitle.includes(kw) || lowSnippet.includes(kw)) score += 10;
+                    });
+
+                    // High Intent Scoring (+5)
+                    highIntentKeywords.forEach(kw => {
+                        if (lowTitle.includes(kw)) score += 5;
+                        if (lowSnippet.includes(kw)) score += 3;
+                    });
+
+                    // Industry Scoring (+2)
+                    industryKeywords.forEach(kw => {
                         if (lowTitle.includes(kw)) score += 2;
                         if (lowSnippet.includes(kw)) score += 1;
                     });
 
-                    // Match Full Industry Words
+                    // Full Industry Match (+3)
                     const industryWords = industry.toLowerCase().replace(/&/g, '').split(/\s+/);
                     industryWords.forEach(word => {
                         if (word.length > 3 && (lowTitle.includes(word) || lowSnippet.includes(word))) score += 3;
                     });
 
-                    // Penalize Junk
+                    // JUNK PENALTY (-20) - Instant Reject
                     junkKeywords.forEach(kw => {
-                        if (lowTitle.includes(kw) || lowSnippet.includes(kw)) score -= 10;
+                        if (lowTitle.includes(kw) || lowSnippet.includes(kw)) score -= 20;
                     });
 
-                    if (score < 2) {
-                        console.log(`      ⏩ Low Score (${score}): skipping "${title}"`);
+                    if (score < 4) { // Increased Threshold for High Quality
+                        console.log(`      ⏩ Score ${score} too low for "${title}"`);
                         return;
                     }
 
