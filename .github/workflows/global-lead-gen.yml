@@ -69,7 +69,8 @@ jobs:
           [ -f international_industry_leads.csv ] && git add -f international_industry_leads.csv || echo "CSV skip"
           [ -f potential_leads.json ] && git add -f potential_leads.json || echo "JSON skip"
           [ -f synced_leads.json ] && git add -f synced_leads.json || echo "Sync logs skip"
-          git commit -m "Auto-Update: New industry leads found [skip ci]" || echo "No changes to commit"
+          [ -f scraped_domains.json ] && git add -f scraped_domains.json || echo "History skip"
+          git commit -m "Auto-Update: New industry leads and history updated [skip ci]" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
