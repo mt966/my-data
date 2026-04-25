@@ -70,7 +70,6 @@ jobs:
           [ -f potential_leads.json ] && git add -f potential_leads.json || echo "JSON skip"
           [ -f synced_leads.json ] && git add -f synced_leads.json || echo "Sync logs skip"
           git commit -m "Auto-Update: New industry leads found [skip ci]" || echo "No changes to commit"
-          git pull --no-rebase origin main || echo "Pull failed"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

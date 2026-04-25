@@ -64,7 +64,6 @@ async function harvestDomains(query, industry, country, page = 0) {
                     });
                     existingWebsites.add(website);
                 }
-            }
         });
 
         return newLeads;
