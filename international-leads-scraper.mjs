@@ -76,35 +76,49 @@ async function probeDeep(homepageUrl) {
     const cleanPhones = [...phones].filter(p => {
         const digits = p.replace(/\D/g, '');
         if (digits.length < 10 || digits.length > 15) return false;
-        // Reject identical digits (e.g., 9999999999, 0000000000)
         if (/^(\d)\1+$/.test(digits)) return false;
-        // Reject sequential junk (e.g., 1234567890)
         if (digits === '1234567890' || digits === '0123456789') return false;
         return true;
     });
 
-    return { emails: cleanEmails, phones: cleanPhones };
+    let siteName = $('meta[property="og:site_name"]').attr('content') || 
+                   $('meta[name="application-name"]').attr('content');
+    if (siteName) siteName = siteName.trim();
+
+    return { emails: cleanEmails, phones: cleanPhones, siteName: siteName };
   } catch (err) { 
-    return { emails: [], phones: [] }; 
+    return { emails: [], phones: [], siteName: null }; 
   }
 }
 
 async function processBatch(batch) {
     return Promise.all(batch.map(async (lead) => {
-        const { emails, phones } = await probeDeep(lead.website);
+        const { emails, phones, siteName } = await probeDeep(lead.website);
         if (emails.length > 0 || phones.length > 0) {
+            
+            // Smart Company Name Logic
+            let finalName = lead.name;
+            if (siteName && siteName.length < 40) {
+                finalName = siteName;
+            } else if (finalName.toLowerCase().includes('home') || finalName.length > 30 || finalName === 'Unknown') {
+                try {
+                    let domain = new URL(lead.website).hostname.replace(/^www\./, '').split('.')[0];
+                    finalName = domain.charAt(0).toUpperCase() + domain.slice(1);
+                } catch(e) {}
+            }
+
             try {
                 await csvWriter.writeRecords([{
-                    name: lead.name,
+                    name: finalName,
                     country: lead.country,
                     email: emails.length > 0 ? emails.slice(0, 3).join('; ') : 'N/A',
                     phone: phones.length > 0 ? phones.slice(0, 2).join('; ') : 'N/A',
                     industry: lead.industry,
                     website: lead.website
                 }]);
-                return { success: true, name: lead.name };
+                return { success: true, name: finalName };
             } catch (err) {
-                return { success: false, name: lead.name };
+                return { success: false, name: finalName };
             }
         }
         return { success: false, name: lead.name };
