@@ -5,6 +5,10 @@ on:
     - cron: '0 */6 * * *' # Runs every 6 hours
   workflow_dispatch: # Allows manual trigger
 
+concurrency:
+  group: "lead-gen"
+  cancel-in-progress: false
+
 jobs:
   generate-leads:
     runs-on: ubuntu-latest
