@@ -48,9 +48,21 @@ async function probeDeep(homepageUrl) {
 
     const subLinks = [];
     $('a').each((i, el) => {
-      const text = $(el).text().toLowerCase();
       const href = $(el).attr('href');
-      if (href && (text.includes('contact') || text.includes('about') || text.includes('impressum') || text.includes('reach') || text.includes('legal'))) {
+      if (!href) return;
+
+      // User Suggestion: Extract perfect clickable phone numbers
+      if (href.toLowerCase().startsWith('tel:')) {
+          phones.add(href.replace(/^tel:/i, '').replace(/[^\d+]/g, ''));
+      }
+      
+      // Extract perfect clickable emails
+      if (href.toLowerCase().startsWith('mailto:')) {
+          emails.add(href.replace(/^mailto:/i, '').split('?')[0].trim());
+      }
+
+      const text = $(el).text().toLowerCase();
+      if (text.includes('contact') || text.includes('about') || text.includes('impressum') || text.includes('reach') || text.includes('legal')) {
         try { 
           const fullUrl = new URL(href, homepageUrl).href;
           if (fullUrl.startsWith(homepageUrl)) subLinks.push(fullUrl);
