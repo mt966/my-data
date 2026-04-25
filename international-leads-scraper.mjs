@@ -64,12 +64,23 @@ async function probeDeep(homepageUrl) {
       const text = $(el).text().toLowerCase();
       const hrefStr = href.toLowerCase();
       
-      // User's Advanced B2B Sub-page Keywords
+      // User's Elite B2B Sub-page Keywords (Multi-lingual & High Intent)
       const targetKeywords = [
-          'contact', 'reach', 'connect', 'touch', 'support', 'help', 'sales', 
-          'enquiry', 'inquiry', 'quote', 'rfq', 
-          'about', 'company', 'profile', 'story', 'overview', 'corporate', 
-          'impressum', 'legal', 'info'
+        // Core Contact
+        'contact', 'contact-us', 'contactus', 'get-in-touch', 'reach-us',
+        'connect', 'support', 'customer-service', 'help-center',
+        // B2B High Intent
+        'enquiry', 'inquiry', 'rfq', 'quote', 'request-quote', 'quote-request',
+        'sales', 'contact-sales',
+        // Company Info
+        'about', 'about-us', 'company', 'company-profile', 'corporate',
+        'overview', 'who-we-are',
+        // Location / Office
+        'location', 'locations', 'office', 'contact-details',
+        // Legal (Europe)
+        'impressum', 'legal',
+        // Multi-language (important)
+        'kontakt', 'contacto', 'contactez', 'contatti'
       ];
 
       if (targetKeywords.some(kw => text.includes(kw) || hrefStr.includes(kw))) {
