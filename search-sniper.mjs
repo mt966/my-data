@@ -37,7 +37,7 @@ async function harvestDomains(query, industry, country, page = 0) {
     console.log(`🔍 Searching: "${query}" in ${country} (Page ${page + 1})...`);
     try {
         const searchUrl = `https://www.bing.com/search?q=${encodeURIComponent(query + ' ' + country)}&first=${offset}`;
-        
+
         const randomUA = userAgents[Math.floor(Math.random() * userAgents.length)];
         const res = await axios.get(searchUrl, {
             headers: {
@@ -69,96 +69,82 @@ async function harvestDomains(query, industry, country, page = 0) {
 
         $('.b_algo').each((i, el) => {
             const title = $(el).find('h2').text().trim();
-            let website = $(el).find('cite').first().text().trim() || $(el).find('.b_caption cite').text().trim();
+            const website = $(el).find('h2 a').attr('href');
             const snippet = $(el).find('.b_caption p, .b_lineclamp3, .b_algoSlug').text().toLowerCase();
             
-            if (website) {
-                website = website.split(' ')[0].replace(' › ', '/');
-                if (!website.startsWith('http')) website = 'https://' + website;
-                
-                // Clean common suffixes and junk
-                website = website.replace(/[.,]$/, '');
-            }
-
-                if (website && !existingWebsites.has(website) && !globalScraped.has(website)) {
+            if (website && website.startsWith('http')) {
+                try {
+                    const domain = new URL(website).hostname.toLowerCase();
                     
-                    // --- B2C BLACKLIST (Reject Retail Stores & Directories) ---
-                    const b2cBlacklist = ['amazon', 'walmart', 'target', 'ebay', 'alibaba', 'aliexpress', 'indiamart', 'tradeindia', 'homedepot', 'lowes', 'sephora', 'ulta', 'macys', 'cvs', 'walgreens', 'sherwin-williams', 'behr', 'menards', 'acehardware', 'flipkart', 'shopee', 'lazada', 'jd.com', 'taobao', 'wayfair', 'bestbuy', 'costco', 'nordstrom', 'maccosmetics', 'dir.indiamart', 'europages', 'justdial'];
+                    // --- B2C BLACKLIST ---
+                    const b2cBlacklist = ['amazon', 'walmart', 'target', 'ebay', 'alibaba', 'aliexpress', 'indiamart', 'tradeindia', 'homedepot', 'lowes', 'sephora', 'ulta', 'macys', 'cvs', 'walgreens', 'sherwin-williams', 'behr', 'menards', 'acehardware', 'flipkart', 'shopee', 'lazada', 'jd.com', 'taobao', 'wayfair', 'bestbuy', 'costco', 'nordstrom', 'maccosmetics', 'dir.indiamart', 'europages', 'justdial', 'wikipedia', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'pinterest'];
                     
-                    let isBlacklisted = false;
-                    try {
-                        let domainStr = new URL(website).hostname.toLowerCase();
-                        isBlacklisted = b2cBlacklist.some(bad => domainStr.includes(bad));
-                    } catch(e) {}
+                    let isBlacklisted = b2cBlacklist.some(bad => domain.includes(bad));
 
-                    if (!isBlacklisted) {
-                        const lowTitle = title.toLowerCase();
-                        const lowSnippet = snippet.toLowerCase();
-                        
-                        // --- RELEVANCE FILTER (Only Factory/B2B/Procurement) ---
-                        const b2bKeywords = [
-                          'factory', 'plant', 'manufacturer', 'supplier', 'distributor',
-                          'wholesale', 'industrial', 'chemical', 'chemicals',
-                          'export', 'exporter', 'trading', 'trader',
-                          'bulk', 'import', 'buyer', 'procurement',
-                          'production', 'materials', 'solutions',
-                          'lubricant', 'coating', 'polymer', 'resin'
-                        ];
-                        
-                        const junkKeywords = [
-                          'news', 'sport', 'league', 'score', 'results',
-                          'weather', 'movie', 'song', 'lyrics',
-                          'blog', 'forum', 'wiki', 'magazine',
-                          'newspaper', 'review', 'retail', 'price-list',
-                          'youtube', 'facebook', 'instagram', 'linkedin',
-                          'amazon', 'flipkart', 'ebay', 'pdf', 'download'
-                        ];
-                        
-                        const hasB2B = b2bKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
-                        const hasJunk = junkKeywords.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw));
-                        
-                        // Strict check: Must have B2B signals and NO junk signals
-                        if (!hasB2B && !lowTitle.includes(industry.toLowerCase().split(' ')[0])) {
-                            console.log(`      ⏩ Skipping non-B2B title: "${title}"`);
-                            return;
-                        }
-                        if (hasJunk) {
-                            console.log(`      ⏩ Skipping Junk/News: "${title}"`);
-                            return;
-                        }
+                if (!isBlacklisted && !existingWebsites.has(website) && !globalScraped.has(website)) {
+                    const lowTitle = title.toLowerCase();
+                    const lowSnippet = snippet.toLowerCase();
+                    
+                    // --- SMART SCORING SYSTEM (Replaces Strict Reject) ---
+                    let score = 0;
+                    const b2bKeywords = ['factory', 'plant', 'manufacturer', 'supplier', 'distributor', 'wholesale', 'industrial', 'chemical', 'chemicals', 'export', 'exporter', 'trading', 'trader', 'bulk', 'import', 'buyer', 'procurement', 'production', 'materials', 'solutions', 'lubricant', 'coating', 'polymer', 'resin'];
+                    const junkKeywords = ['news', 'sport', 'league', 'score', 'results', 'weather', 'movie', 'song', 'lyrics', 'blog', 'forum', 'wiki', 'magazine', 'newspaper', 'review', 'retail', 'price-list', 'pdf', 'download'];
+                    
+                    // Score for B2B signals
+                    b2bKeywords.forEach(kw => {
+                        if (lowTitle.includes(kw)) score += 2;
+                        if (lowSnippet.includes(kw)) score += 1;
+                    });
 
-                        let cName = title.split(/ - | \| |: /)[0].trim();
-                        // Fallback to domain name if title is generic or too long (e.g. blog post title)
-                        if (cName.toLowerCase().includes('home') || cName.length > 30) {
-                            try {
-                                cName = new URL(website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
-                            } catch(e) { cName = "Unknown"; }
-                        }
-                        newLeads.push({
-                            name: cName,
-                            country: country,
-                            website: website,
-                            industry: industry
-                        });
-                        existingWebsites.add(website);
+                    // Match Full Industry Words
+                    const industryWords = industry.toLowerCase().replace(/&/g, '').split(/\s+/);
+                    industryWords.forEach(word => {
+                        if (word.length > 3 && (lowTitle.includes(word) || lowSnippet.includes(word))) score += 3;
+                    });
+
+                    // Penalize Junk
+                    junkKeywords.forEach(kw => {
+                        if (lowTitle.includes(kw) || lowSnippet.includes(kw)) score -= 10;
+                    });
+
+                    if (score < 2) {
+                        console.log(`      ⏩ Low Score (${score}): skipping "${title}"`);
+                        return;
                     }
+
+                    let cName = title.split(/ - | \| |: /)[0].trim();
+                    // Fallback to domain name if title is generic or too long (e.g. blog post title)
+                    if (cName.toLowerCase().includes('home') || cName.length > 30) {
+                        try {
+                            cName = new URL(website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
+                        } catch (e) { cName = "Unknown"; }
+                    }
+                    newLeads.push({
+                        name: cName,
+                        country: country,
+                        website: website,
+                        industry: industry
+                    });
+                    existingWebsites.add(website);
                 }
+                } catch(e) {}
+            }
         });
 
         return newLeads;
     } catch (err) {
-        console.error(`   ❌ Search failed for [${query}] Page ${page+1}: ${err.message}`);
+        console.error(`   ❌ Search failed for [${query}] Page ${page + 1}: ${err.message}`);
         return [];
     }
 }
 
 // Helper to rotate countries
 function shuffle(array) {
-    let currentIndex = array.length,  randomIndex;
+    let currentIndex = array.length, randomIndex;
     while (currentIndex != 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
     return array;
 }
@@ -167,59 +153,57 @@ async function startSniper() {
     console.log('🎯 STARTING GLOBAL SEARCH SNIPER (BATCH MODE)...');
     // Flatten industries and shuffle
     const allIndustryItems = shuffle(industries.flatMap(c => c.items));
-    
+
     // FULL PRODUCTION: All countries, shuffled
     const countriesToSearch = shuffle([...targetCountries]);
     console.log(`🎯 TARGETING: ${countriesToSearch.length} Countries for ${allIndustryItems.length} Industries`);
-    
-    // REDUCED SNIPER TIME TO 30 MINUTES to allow the scraper to process the massive backlog
-    const MAX_RUN_TIME_MS = 30 * 60 * 1000; 
+
+    // PRODUCTION LIMIT: 60 minutes for high-volume B2B data
+    const MAX_RUN_TIME_MS = 60 * 60 * 1000;
     const startTime = Date.now();
     let timeLimitReached = false;
 
+    // Parallel Processing: Process 3 countries at once
+    const COUNTRY_BATCH_SIZE = 3; 
+
     for (const industry of allIndustryItems) {
         if (timeLimitReached) break;
-        for (const country of countriesToSearch) {
+        
+        for (let i = 0; i < countriesToSearch.length; i += COUNTRY_BATCH_SIZE) {
             if (timeLimitReached) break;
-            const shuffledQueries = shuffle([...searchQueries]);
-            for (const qBase of shuffledQueries) { // Full query base
-                if (Date.now() - startTime > MAX_RUN_TIME_MS) {
-                    console.log(`⏱️ Time limit of 1.5 hours reached. Stopping sniper gracefully to allow scraper to run...`);
-                    timeLimitReached = true;
-                    break;
-                }
-
-                try {
-                    const fullQuery = `${industry} ${qBase}`;
-                    
-                    // Search first 5 pages for maximum depth
-                    for (let page = 0; page < 5; page++) {
-                        const leads = await harvestDomains(fullQuery, industry, country, page);
-                        
-                        if (leads === null) break; // Bing blocked or no more results, stop paginating!
-
-                        if (leads && leads.length > 0) {
-                            potentialLeads.push(...leads);
-                            console.log(`   ✅ Harvested ${leads.length} new leads for ${industry} in ${country} (Page ${page+1}).`);
-                            fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
-                        } else if (leads && leads.length === 0) {
-                            break; // Empty page, no more results
-                        }
-                        
-                        // Human-like randomized delay between pages (3-7 seconds)
-                        const delay = Math.floor(Math.random() * (7000 - 3000 + 1)) + 3000;
-                        await new Promise(r => setTimeout(r, delay));
-                    }
-                } catch (loopErr) {
-                    console.error(`   ⚠️ Critical error in loop: ${loopErr.message}`);
-                }
-                
-                // Small safety delay for test
-                await new Promise(r => setTimeout(r, 3000));
+            if (Date.now() - startTime > MAX_RUN_TIME_MS) {
+                console.log(`⏱️ Time limit of 60 minutes reached. Stopping sniper...`);
+                timeLimitReached = true;
+                break;
             }
+
+            const countryBatch = countriesToSearch.slice(i, i + COUNTRY_BATCH_SIZE);
+            console.log(`\n🚀 Parallel Batch: Searching ${industry} in [${countryBatch.join(', ')}]`);
+
+            await Promise.all(countryBatch.map(async (country) => {
+                const shuffledQueries = shuffle([...searchQueries]);
+                for (const qBase of shuffledQueries) {
+                    if (timeLimitReached) break;
+                    
+                    try {
+                        const fullQuery = `${industry} ${qBase}`;
+                        for (let page = 0; page < 3; page++) { // Faster depth: 3 pages instead of 5
+                            const leads = await harvestDomains(fullQuery, industry, country, page);
+                            if (leads === null || (leads && leads.length === 0)) break;
+
+                            if (leads && leads.length > 0) {
+                                potentialLeads.push(...leads);
+                                console.log(`   ✅ [${country}] Found ${leads.length} leads for ${industry}`);
+                                fs.writeFileSync(POTENTIAL_LEADS_PATH, JSON.stringify(potentialLeads, null, 2));
+                            }
+                            await new Promise(r => setTimeout(r, 4000)); // Safer delay for parallel
+                        }
+                    } catch (err) {}
+                }
+            }));
         }
     }
-    
+
     console.log(`✨ SNIPER COMPLETED. Total potential leads: ${potentialLeads.length}`);
 }
 
