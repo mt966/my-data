@@ -62,7 +62,17 @@ async function probeDeep(homepageUrl) {
       }
 
       const text = $(el).text().toLowerCase();
-      if (text.includes('contact') || text.includes('about') || text.includes('impressum') || text.includes('reach') || text.includes('legal')) {
+      const hrefStr = href.toLowerCase();
+      
+      // User's Advanced B2B Sub-page Keywords
+      const targetKeywords = [
+          'contact', 'reach', 'connect', 'touch', 'support', 'help', 'sales', 
+          'enquiry', 'inquiry', 'quote', 'rfq', 
+          'about', 'company', 'profile', 'story', 'overview', 'corporate', 
+          'impressum', 'legal', 'info'
+      ];
+
+      if (targetKeywords.some(kw => text.includes(kw) || hrefStr.includes(kw))) {
         try { 
           const fullUrl = new URL(href, homepageUrl).href;
           if (fullUrl.startsWith(homepageUrl)) subLinks.push(fullUrl);
