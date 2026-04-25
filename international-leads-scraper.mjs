@@ -73,7 +73,15 @@ async function probeDeep(homepageUrl) {
       return !isImage && e.length < 50 && !e.includes('example.com') && !e.includes('yourdomain.com');
     });
 
-    const cleanPhones = [...phones].filter(p => p.replace(/\D/g, '').length >= 10 && p.replace(/\D/g, '').length <= 15);
+    const cleanPhones = [...phones].filter(p => {
+        const digits = p.replace(/\D/g, '');
+        if (digits.length < 10 || digits.length > 15) return false;
+        // Reject identical digits (e.g., 9999999999, 0000000000)
+        if (/^(\d)\1+$/.test(digits)) return false;
+        // Reject sequential junk (e.g., 1234567890)
+        if (digits === '1234567890' || digits === '0123456789') return false;
+        return true;
+    });
 
     return { emails: cleanEmails, phones: cleanPhones };
   } catch (err) { 

@@ -48,27 +48,13 @@ async function harvestDomains(query, industry, country, page = 0) {
                 website = website.replace(/[.,]$/, '');
             }
 
-            if (website && !existingWebsites.has(website)) {
-                /*
-                const keywords = [industry, 'contact', 'email', 'manufacturer', 'supplier', 'exporter', 'importer', 'distributor', 'wholesale', 'buyer'];
-                const matchedKeywords = keywords.filter(kw => snippet.toLowerCase().includes(kw.toLowerCase()));
-        
-                // DEBUG: Relaxed filtering for test
-                // if (matchedKeywords.length < 2) return null;
-                */
-
-                const isRelevant = snippet.includes('company') || 
-                                 snippet.includes('manufacturer') || 
-                                 snippet.includes('supplier') || 
-                                 snippet.includes('industry') ||
-                                 snippet.includes('distributor') ||
-                                 snippet.includes('exporter') ||
-                                 snippet.includes('importer');
-
-                if (isRelevant) {
-                    let cName = title.split(' - ')[0].split(' | ')[0].trim();
-                    if (cName.toLowerCase() === 'home' || cName.toLowerCase() === 'home page') {
-                        cName = title.split(' - ')[1]?.trim() || title.split(' | ')[1]?.trim() || new URL(website).hostname.replace('www.', '').split('.')[0].toUpperCase();
+                if (website && !existingWebsites.has(website)) {
+                    let cName = title.split(/ - | \| |: /)[0].trim();
+                    // Fallback to domain name if title is generic or too long (e.g. blog post title)
+                    if (cName.toLowerCase().includes('home') || cName.length > 30) {
+                        try {
+                            cName = new URL(website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
+                        } catch(e) { cName = "Unknown"; }
                     }
                     newLeads.push({
                         name: cName,
