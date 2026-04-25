@@ -115,8 +115,11 @@ async function probeDeep(homepageUrl) {
         return true;
     });
 
+    // PRO COMPANY NAME DISCOVERY
     let siteName = $('meta[property="og:site_name"]').attr('content') || 
-                   $('meta[name="application-name"]').attr('content');
+                   $('meta[name="application-name"]').attr('content') ||
+                   $('title').text().split(/[-|:|—]/)[0].trim();
+    
     if (siteName) siteName = siteName.trim();
 
     return { emails: cleanEmails, phones: cleanPhones, siteName: siteName };
@@ -130,15 +133,17 @@ async function processBatch(batch) {
         const { emails, phones, siteName } = await probeDeep(lead.website);
         if (emails.length > 0 || phones.length > 0) {
             
-            // Smart Company Name Logic
-            let finalName = lead.name;
-            if (siteName && siteName.length < 40) {
-                finalName = siteName;
-            } else if (finalName.toLowerCase().includes('home') || finalName.length > 30 || finalName === 'Unknown') {
+            // Smart Company Name Logic (Strict & Professional)
+            let finalName = siteName || lead.name;
+            const genericJunk = ['home', 'welcome', 'index', 'website', 'official', 'page', 'site', 'homepage', 'online', 'portal'];
+            
+            if (!finalName || finalName.length < 3 || finalName.length > 40 || genericJunk.some(j => finalName.toLowerCase().includes(j))) {
                 try {
                     let domain = new URL(lead.website).hostname.replace(/^www\./, '').split('.')[0];
                     finalName = domain.charAt(0).toUpperCase() + domain.slice(1);
-                } catch(e) {}
+                } catch(e) {
+                    finalName = lead.name || "Industrial Company";
+                }
             }
 
             try {
