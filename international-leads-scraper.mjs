@@ -91,7 +91,8 @@ async function probeDeep(homepageUrl) {
       }
     });
 
-    for (const sub of [...new Set(subLinks)].slice(0, 3)) {
+    // PRO UPGRADE: Deep-probe up to 7 sub-pages for hidden B2B contact info
+    for (const sub of [...new Set(subLinks)].slice(0, 7)) {
       try {
         const sRes = await axios.get(sub, { timeout: 12000, headers: { 'User-Agent': 'Mozilla/5.0' }, validateStatus: false });
         if (sRes.status < 400) {
