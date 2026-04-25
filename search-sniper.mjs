@@ -5,6 +5,7 @@ import { industries, targetCountries, searchQueries } from './industry-config.mj
 
 const POTENTIAL_LEADS_PATH = './potential_leads.json';
 const MASTER_CSV_PATH = './international_industry_leads.csv';
+const SCRAPED_DOMAINS_PATH = './scraped_domains.json';
 
 // Load existing leads to avoid duplicates
 let potentialLeads = [];
@@ -17,6 +18,11 @@ if (fs.existsSync(POTENTIAL_LEADS_PATH)) {
 }
 
 const existingWebsites = new Set(potentialLeads.map(l => l.website));
+
+let globalScraped = new Set();
+if (fs.existsSync(SCRAPED_DOMAINS_PATH)) {
+    globalScraped = new Set(JSON.parse(fs.readFileSync(SCRAPED_DOMAINS_PATH, 'utf8')));
+}
 
 async function harvestDomains(query, industry, country, page = 0) {
     const offset = page * 10 + 1;
@@ -53,7 +59,7 @@ async function harvestDomains(query, industry, country, page = 0) {
                 website = website.replace(/[.,]$/, '');
             }
 
-                if (website && !existingWebsites.has(website)) {
+                if (website && !existingWebsites.has(website) && !globalScraped.has(website)) {
                     
                     // --- B2C BLACKLIST (Reject Retail Stores & Directories) ---
                     const b2cBlacklist = ['amazon', 'walmart', 'target', 'ebay', 'alibaba', 'aliexpress', 'indiamart', 'tradeindia', 'homedepot', 'lowes', 'sephora', 'ulta', 'macys', 'cvs', 'walgreens', 'sherwin-williams', 'behr', 'menards', 'acehardware', 'flipkart', 'shopee', 'lazada', 'jd.com', 'taobao', 'wayfair', 'bestbuy', 'costco', 'nordstrom', 'maccosmetics', 'dir.indiamart', 'europages', 'justdial'];

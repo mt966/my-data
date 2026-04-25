@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 const CSV_PATH = path.join(process.cwd(), 'international_industry_leads.csv');
 const LEADS_JSON_PATH = path.join(process.cwd(), 'potential_leads.json');
+const SCRAPED_DOMAINS_PATH = path.join(process.cwd(), 'scraped_domains.json');
 
 const fileExists = fs.existsSync(CSV_PATH);
 const csvWriter = createObjectCsvWriter({
@@ -147,6 +148,11 @@ async function runLeadProcessor() {
     return;
   }
 
+  let globalScraped = new Set();
+  if (fs.existsSync(SCRAPED_DOMAINS_PATH)) {
+    globalScraped = new Set(JSON.parse(fs.readFileSync(SCRAPED_DOMAINS_PATH, 'utf8')));
+  }
+
   const processedWebsites = new Set();
   if (fs.existsSync(CSV_PATH)) {
     const content = fs.readFileSync(CSV_PATH, 'utf8');
@@ -157,9 +163,9 @@ async function runLeadProcessor() {
   }
 
   const leads = JSON.parse(fs.readFileSync(LEADS_JSON_PATH, 'utf8'));
-  const remainingLeads = leads.filter(l => !processedWebsites.has(l.website));
+  const remainingLeads = leads.filter(l => !processedWebsites.has(l.website) && !globalScraped.has(l.website));
   
-  console.log(`📊 Total: ${leads.length} | To Process: ${remainingLeads.length}`);
+  console.log(`📊 Total Buffer: ${leads.length} | To Process Now: ${remainingLeads.length}`);
 
   const BATCH_SIZE = 5; // Process 5 websites at once
   for (let i = 0; i < remainingLeads.length; i += BATCH_SIZE) {
@@ -172,11 +178,17 @@ async function runLeadProcessor() {
         else console.log(`   ⚠️ ${res.name}: No details found or probe failed.`);
     });
 
+    // Mark batch as processed
+    batch.forEach(l => globalScraped.add(l.website));
+    fs.writeFileSync(SCRAPED_DOMAINS_PATH, JSON.stringify([...globalScraped], null, 2));
+
     // Short cooling delay between batches
     await new Promise(r => setTimeout(r, 3000));
   }
 
-  console.log('\n✨ ALL LEADS PROCESSED. Check international_industry_leads.csv');
+  // Clear the buffer for the next 6-hour run
+  fs.writeFileSync(LEADS_JSON_PATH, JSON.stringify([], null, 2));
+  console.log('\n✨ ALL LEADS PROCESSED. Buffer cleared. Check international_industry_leads.csv');
 }
 
 runLeadProcessor();
