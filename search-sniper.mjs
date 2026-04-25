@@ -101,11 +101,11 @@ function shuffle(array) {
 
 async function startSniper() {
     console.log('🎯 STARTING GLOBAL SEARCH SNIPER (BATCH MODE)...');
-    // Flatten industries
-    const allIndustryItems = industries.flatMap(c => c.items);
+    // Flatten industries and shuffle
+    const allIndustryItems = shuffle(industries.flatMap(c => c.items));
     
-    // FULL PRODUCTION: All countries
-    const countriesToSearch = targetCountries;
+    // FULL PRODUCTION: All countries, shuffled
+    const countriesToSearch = shuffle([...targetCountries]);
     console.log(`🎯 TARGETING: ${countriesToSearch.length} Countries for ${allIndustryItems.length} Industries`);
     
     const MAX_RUN_TIME_MS = 1.5 * 60 * 60 * 1000; // 1.5 hours
@@ -116,7 +116,8 @@ async function startSniper() {
         if (timeLimitReached) break;
         for (const country of countriesToSearch) {
             if (timeLimitReached) break;
-            for (const qBase of searchQueries) { // Full query base
+            const shuffledQueries = shuffle([...searchQueries]);
+            for (const qBase of shuffledQueries) { // Full query base
                 if (Date.now() - startTime > MAX_RUN_TIME_MS) {
                     console.log(`⏱️ Time limit of 1.5 hours reached. Stopping sniper gracefully to allow scraper to run...`);
                     timeLimitReached = true;
