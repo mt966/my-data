@@ -58,9 +58,11 @@ async function harvestDomains(query, industry, country, page = 0) {
                     const lowTitle = title.toLowerCase();
                     const lowSnippet = snippet.toLowerCase();
 
-                    // Tier 1 Priority (+15)
-                    const tier1 = ["lubricant", "grease", "paint", "coating", "plastic", "polymer"];
-                    if (tier1.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score += 15;
+                    // Current Industry Match (+15) - Dynamic Pointing
+                    const currentIndustryWords = industry.toLowerCase().replace(/&/g, '').split(/\s+/).filter(w => w.length > 3);
+                    if (currentIndustryWords.some(word => lowTitle.includes(word) || lowSnippet.includes(word))) {
+                        score += 15;
+                    }
 
                     // HCO Specific Signals (+25) - The Holy Grail
                     const hcoWords = ['hydrogenated castor oil', 'castor wax', '12 hydroxy stearic acid', '12-hsa', 'hco', 'oleochemical', 'fatty acid', 'stearic acid'];
@@ -69,23 +71,26 @@ async function harvestDomains(query, industry, country, page = 0) {
                     });
 
                     // Buyer Intent (+10)
-                    const buyerIntent = ['procurement', 'purchasing', 'buyer', 'sourcing', 'raw material', 'importer', 'rfq', 'inquiry', 'enquiry'];
+                    const buyerIntent = ['procurement', 'purchasing', 'buyer', 'sourcing', 'raw material', 'importer', 'rfq', 'inquiry', 'enquiry', 'wholesale'];
                     buyerIntent.forEach(kw => {
                         if (lowTitle.includes(kw)) score += 10;
                         if (lowSnippet.includes(kw)) score += 5;
                     });
 
-                    // Factory/Manufacturer Signal (+5)
-                    const factorySignal = ['manufacturer', 'factory', 'plant', 'production', 'facility'];
-                    if (factorySignal.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score += 5;
+                    // Factory/Manufacturer Signal (+8)
+                    const factorySignal = ['manufacturer', 'factory', 'plant', 'production', 'facility', 'industrial'];
+                    if (factorySignal.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score += 8;
 
                     // COMPETITOR PENALTY (-100) - Instant Reject
-                    const competitors = ['exporter from india', 'indian supplier', 'exporter india', 'india chemicals', 'export from india'];
+                    const competitors = ['exporter from india', 'indian supplier', 'exporter india', 'india chemicals', 'export from india', 'verified supplier', 'premium supplier'];
                     if (competitors.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score -= 100;
 
-                    // STRICT THRESHOLD: Must have multiple industrial/intent signals
-                    if (score < 10) return;
-
+                    // BALANCED THRESHOLD: Must have at least one strong industrial signal
+                    if (score < 8) {
+                        console.log(`      ⏩ Score ${score} too low for "${title}"`);
+                        return;
+                    }  
+                    
                     let cName = title.split(/ - | \| |: /)[0].trim();
                     if (cName.toLowerCase().includes('home') || cName.length > 30) {
                         cName = domain.replace(/^www\./, '').split('.')[0].toUpperCase();

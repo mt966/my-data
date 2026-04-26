@@ -28,10 +28,10 @@ export const targetCountries = [
 ];
 
 export const searchQueries = [
-  "manufacturer bulk raw material procurement sourcing",
-  "manufacturing plant purchasing manager contact",
-  "factory production facility material buyer",
-  "importer bulk buyer procurement lead",
-  "chemicals sourcing manager contact",
-  "wholesale industrial material purchasing"
+  "manufacturer bulk raw material procurement sourcing -wikipedia -amazon -ebay -news",
+  "manufacturing plant purchasing manager contact -dictionary -encyclopedia",
+  "factory production facility material buyer -blog -forum",
+  "importer bulk buyer procurement lead -retail -shop",
+  "chemicals sourcing manager contact -youtube -facebook",
+  "wholesale industrial material purchasing -aliexpress -alibaba"
 ];
