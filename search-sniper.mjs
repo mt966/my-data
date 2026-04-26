@@ -72,7 +72,7 @@ async function harvestDomains(query, industry, country, page = 0) {
             if (website && website.startsWith('http')) {
                 try {
                     const domain = new URL(website).hostname.toLowerCase();
-                    const hardBlacklist = ['amazon', 'walmart', 'ebay', 'alibaba', 'indiamart', 'tradeindia', 'wikipedia', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'google', 'bing', 'yahoo', 'marketresearch', 'globenewswire', 'businesswire', 'prnewswire', 'investor', 'news', 'blog', 'forum', 'yellowpages', 'europages', 'thomasnet', 'kompass', 'directindustry', 'panjiva', 'importgenius'];
+                    const hardBlacklist = ['amazon', 'walmart', 'ebay', 'alibaba', 'indiamart', 'tradeindia', 'wikipedia', 'facebook', 'instagram', 'linkedin', 'youtube', 'pinterest', 'google', 'bing', 'yahoo', 'marketresearch', 'globenewswire', 'businesswire', 'prnewswire', 'investor', 'news', 'blog', 'forum', 'yellowpages', 'europages', 'thomasnet', 'kompass', 'directindustry', 'panjiva', 'importgenius', 'sephora', 'target', 'macys', 'homedepot', 'lowes', 'cvs', 'walgreens', 'ulta', 'nordstrom', 'menards', 'acehardware', 'premierleague', 'sport', 'marca', 'goal', 'vistaprint'];
                     if (hardBlacklist.some(bad => domain.includes(bad))) return;
 
                     let score = 0;
@@ -102,7 +102,7 @@ async function harvestDomains(query, industry, country, page = 0) {
                     const competitors = ['exporter from india', 'indian supplier', 'exporter india', 'india chemicals', 'export from india', 'verified supplier', 'premium supplier'];
                     if (competitors.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score -= 100;
 
-                    if (score < 8) return;
+                    if (score < 20) return; // Strict B2B filtering for HCO bulk buyers
 
                     let cName = title.split(/ - | \| |: /)[0].trim();
                     if (cName.toLowerCase().includes('home') || cName.length > 30) {
