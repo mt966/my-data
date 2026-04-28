@@ -98,12 +98,14 @@ async function harvestDomains(query, industry, country, page = 0) {
                     const factorySignal = ['manufacturer', 'factory', 'plant', 'production', 'facility', 'industrial'];
                     if (factorySignal.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score += 8;
 
-                    // Indian Competitor Penalty (-100)
-                    const competitors = ['exporter from india', 'indian supplier', 'exporter india', 'india chemicals', 'export from india', 'verified supplier', 'premium supplier'];
+                    // Indian Competitor Penalty (-100) - Strict India Focus
+                    const competitors = ['exporter from india', 'indian supplier', 'exporter india', 'india chemicals', 'export from india', 'indiamart', 'tradeindia'];
                     if (competitors.some(kw => lowTitle.includes(kw) || lowSnippet.includes(kw))) score -= 100;
 
-                    if (score < 20) return; // Strict B2B filtering for HCO bulk buyers
+                    // BALANCED THRESHOLD: Must have at least one strong industrial signal
+                    if (score < 10) return; // Balanced threshold for high-quality industrial leads
 
+                    console.log(`      🌟 High Quality Lead! [Score: ${score}] - ${title}`);
                     let cName = title.split(/ - | \| |: /)[0].trim();
                     if (cName.toLowerCase().includes('home') || cName.length > 30) {
                         cName = domain.replace(/^www\./, '').split('.')[0].toUpperCase();
@@ -126,7 +128,7 @@ async function startSniper() {
     const allIndustryItems = industries.flatMap(c => c.items);
     
     const startTime = Date.now();
-    const MAX_RUN_TIME = 90 * 60 * 1000; // 90 minutes stealth run
+    const MAX_RUN_TIME = 200 * 60 * 1000; // 200 minutes stealth run (3.3 hours)
 
     for (const industry of allIndustryItems) {
         if (Date.now() - startTime > MAX_RUN_TIME) break;
