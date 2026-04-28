@@ -116,7 +116,15 @@
 
                 <!-- Sync Section -->
                 <div class="card" id="section-sync">
-                    <h3><i class="fas fa-cloud-upload-alt" style="color: #00ff88;"></i> Sheet Sync</h3>
+                    <h3><i class="fas fa-cloud-upload-alt" style="color: #00ff88;"></i> Sheet Sync & Access</h3>
+                    <div class="input-group">
+                        <label>GitHub Personal Access Token (PAT)</label>
+                        <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx">
+                        <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-dim);">
+                            <input type="checkbox" id="remember-token" style="width: 14px; height: 14px; cursor: pointer;">
+                            <label for="remember-token" style="margin-bottom: 0; cursor: pointer;">Remember Token on this device</label>
+                        </div>
+                    </div>
                     <div class="input-group">
                         <label>Google Sheet Webhook URL</label>
                         <input type="password" id="webhook-url" placeholder="Paste your webhook URL here">

@@ -1,4 +1,4 @@
-// Dashboard Logic - Production Edition (GitHub Integrated)
+// Dashboard Logic - Production Edition (With Persistence)
 document.addEventListener('DOMContentLoaded', () => {
     
     const REPO_OWNER = 'mt966';
@@ -30,8 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const delayMax = document.getElementById('delay-max');
     const contactKeywords = document.getElementById('contact-keywords');
     const terminal = document.getElementById('terminal');
+    const githubTokenInput = document.getElementById('github-token');
+    const rememberTokenCheckbox = document.getElementById('remember-token');
 
     let industries = [...DEFAULT_CONFIG.industries];
+
+    // --- 0. Load Stored Token ---
+    const storedToken = localStorage.getItem('hco_github_token');
+    if (storedToken) {
+        githubTokenInput.value = storedToken;
+        rememberTokenCheckbox.checked = true;
+    }
 
     function log(message, color = '#aaa') {
         const p = document.createElement('p');
@@ -53,16 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.removeTag = (index) => { industries.splice(index, 1); renderTags(); };
 
-    // GitHub API Helper
     async function updateGitHubConfig(token, configData) {
         try {
-            log('Fetching current config state...', '#00f2ff');
+            log('Connecting to GitHub API...', '#00f2ff');
             const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/config.json`, {
                 headers: { 'Authorization': `token ${token}` }
             });
             const fileData = await res.json();
             
-            log('Updating config.json on GitHub...', '#7000ff');
+            log('Saving new settings to config.json...', '#7000ff');
             const updateRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/config.json`, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
@@ -74,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (updateRes.ok) {
-                log('SUCCESS: Repository updated!', '#00ff88');
+                log('SUCCESS: All settings updated A to Z.', '#00ff88');
                 return true;
             } else {
-                throw new Error('GitHub API Error');
+                throw new Error('Invalid Token or Permission denied');
             }
         } catch (err) {
             log(`ERROR: ${err.message}`, '#ff4444');
@@ -86,39 +94,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function triggerWorkflow(token) {
-        log('Triggering Lead Gen Workflow...', '#ffaa00');
+        log('Starting Lead Gen Engine...', '#ffaa00');
         const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/global-lead-gen.yml/dispatches`, {
             method: 'POST',
             headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ ref: 'main' })
         });
-        if (res.ok) log('JOB STARTED! Bot is now hunting leads.', '#00ff88');
+        if (res.ok) log('JOB STARTED! Check your Google Sheet in 10 mins.', '#00ff88');
         else log('Failed to start job. Check Token permissions.', '#ff4444');
     }
 
     // Handlers
-    thresholdSlider.addEventListener('input', (e) => thresholdVal.textContent = e.target.value);
-    hcoSlider.addEventListener('input', (e) => hcoVal.textContent = e.target.value);
-
-    industryInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && industryInput.value.trim() !== '') {
-            industries.push(industryInput.value.trim()); industryInput.value = ''; renderTags();
-        }
-    });
-
     document.getElementById('save-settings-btn').addEventListener('click', async function() {
-        const token = prompt('Enter your GitHub Personal Access Token (PAT) to save:');
-        if (!token) return;
+        const token = githubTokenInput.value.trim();
+        if (!token) { alert('Please enter your GitHub Token first!'); return; }
+
+        if (rememberTokenCheckbox.checked) {
+            localStorage.setItem('hco_github_token', token);
+        } else {
+            localStorage.removeItem('hco_github_token');
+        }
 
         this.disabled = true;
         const configToSave = {
             targeting: { industries: [{ items: industries }], countries: [] }, 
             scoring: { threshold: parseInt(thresholdSlider.value), hco_bonus: parseInt(hcoSlider.value) },
-            performance: { search_pages: parseInt(searchDepth.value), scraper_depth: parseInt(scraperDepth.value) }
+            performance: { search_pages: parseInt(searchDepth.value), scraper_depth: parseInt(scraperDepth.value) },
+            discovery: { contact_keywords: contactKeywords.value.split(',').map(k => k.trim()) }
         };
 
         await updateGitHubConfig(token, configToSave);
         this.disabled = false;
+    });
+
+    document.getElementById('run-now-btn').addEventListener('click', async () => {
+        const token = githubTokenInput.value.trim();
+        if (!token) { alert('Please enter your GitHub Token first!'); return; }
+        await triggerWorkflow(token);
     });
 
     document.getElementById('reset-settings-btn').addEventListener('click', () => {
@@ -133,12 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('run-now-btn').addEventListener('click', async () => {
-        const token = prompt('Enter GitHub Token to start job:');
-        if (token) await triggerWorkflow(token);
-    });
-
-    // Sidebar Navigation (Smooth Scroll)
+    // Navigation & Sliders
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -148,6 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetEl = targetId === 'top' ? document.body : document.getElementById(targetId);
             if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+    });
+
+    thresholdSlider.addEventListener('input', (e) => thresholdVal.textContent = e.target.value);
+    hcoSlider.addEventListener('input', (e) => hcoVal.textContent = e.target.value);
+    industryInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && industryInput.value.trim() !== '') {
+            industries.push(industryInput.value.trim()); industryInput.value = ''; renderTags();
+        }
     });
 
     renderTags();
