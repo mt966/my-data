@@ -16,12 +16,12 @@
                 <span>HCO HUNTER</span>
             </div>
             <nav>
-                <div class="nav-item active"><i class="fas fa-th-large"></i> Overview</div>
-                <div class="nav-item"><i class="fas fa-bullseye"></i> Targeting</div>
-                <div class="nav-item"><i class="fas fa-vial"></i> Scoring Lab</div>
-                <div class="nav-item"><i class="fas fa-user-secret"></i> Stealth</div>
-                <div class="nav-item"><i class="fas fa-database"></i> Leads Data</div>
-                <div class="nav-item"><i class="fas fa-cog"></i> Sheet Sync</div>
+                <div class="nav-item active" data-target="top"><i class="fas fa-th-large"></i> Overview</div>
+                <div class="nav-item" data-target="section-targeting"><i class="fas fa-bullseye"></i> Targeting</div>
+                <div class="nav-item" data-target="section-scoring"><i class="fas fa-vial"></i> Scoring Lab</div>
+                <div class="nav-item" data-target="section-stealth"><i class="fas fa-user-secret"></i> Stealth</div>
+                <div class="nav-item" data-target="section-logs"><i class="fas fa-terminal"></i> Live Logs</div>
+                <div class="nav-item" data-target="section-sync"><i class="fas fa-cog"></i> Sheet Sync</div>
             </nav>
 
             <div style="margin-top: auto; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.8rem; color: var(--text-dim);">
@@ -50,7 +50,7 @@
 
             <div class="dashboard-grid">
                 <!-- Targeting Section -->
-                <div class="card">
+                <div class="card" id="section-targeting">
                     <h3><i class="fas fa-industry" style="color: var(--primary);"></i> Targeting Hub</h3>
                     <div class="input-group">
                         <label>Target Industries (Comma separated)</label>
@@ -73,7 +73,7 @@
                 </div>
 
                 <!-- Scoring Section -->
-                <div class="card">
+                <div class="card" id="section-scoring">
                     <h3><i class="fas fa-chart-line" style="color: var(--secondary);"></i> Scoring Lab</h3>
                     <div class="input-group">
                         <label>Quality Threshold (Min Score: <span id="threshold-val">10</span>)</label>
@@ -90,7 +90,7 @@
                 </div>
 
                 <!-- Performance Section -->
-                <div class="card">
+                <div class="card" id="section-stealth">
                     <h3><i class="fas fa-tachometer-alt" style="color: #ffaa00;"></i> Stealth & Performance</h3>
                     <div class="input-group">
                         <label>Search Depth (Pages per query)</label>
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Sync Section -->
-                <div class="card">
+                <div class="card" id="section-sync">
                     <h3><i class="fas fa-cloud-upload-alt" style="color: #00ff88;"></i> Sheet Sync</h3>
                     <div class="input-group">
                         <label>Google Sheet Webhook URL</label>
@@ -135,7 +135,7 @@
             </div>
 
             <!-- Terminal/Logs Section -->
-            <div class="card" style="margin-top: 2rem; background: #000;">
+            <div class="card" id="section-logs" style="margin-top: 2rem; background: #000;">
                 <h3 style="color: #00ff88; font-family: monospace;"><i class="fas fa-terminal"></i> Live Job Execution Logs</h3>
                 <div id="terminal" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #aaa; line-height: 1.6;">
                     <p>> System initialized...</p>

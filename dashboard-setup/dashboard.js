@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const delayMax = document.getElementById('delay-max');
     const contactKeywords = document.getElementById('contact-keywords');
     const terminal = document.getElementById('terminal');
-    const webhookUrl = document.getElementById('webhook-url');
 
     let industries = [...DEFAULT_CONFIG.industries];
 
@@ -98,20 +97,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Handlers
+    thresholdSlider.addEventListener('input', (e) => thresholdVal.textContent = e.target.value);
+    hcoSlider.addEventListener('input', (e) => hcoVal.textContent = e.target.value);
+
+    industryInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && industryInput.value.trim() !== '') {
+            industries.push(industryInput.value.trim()); industryInput.value = ''; renderTags();
+        }
+    });
+
     document.getElementById('save-settings-btn').addEventListener('click', async function() {
         const token = prompt('Enter your GitHub Personal Access Token (PAT) to save:');
         if (!token) return;
 
         this.disabled = true;
         const configToSave = {
-            targeting: { industries: [{ items: industries }], countries: [] }, // Simplified for bridge
+            targeting: { industries: [{ items: industries }], countries: [] }, 
             scoring: { threshold: parseInt(thresholdSlider.value), hco_bonus: parseInt(hcoSlider.value) },
             performance: { search_pages: parseInt(searchDepth.value), scraper_depth: parseInt(scraperDepth.value) }
-            // ... Full mapping would go here
         };
 
         await updateGitHubConfig(token, configToSave);
         this.disabled = false;
+    });
+
+    document.getElementById('reset-settings-btn').addEventListener('click', () => {
+        if (confirm('Reset to factory defaults?')) {
+            industries = [...DEFAULT_CONFIG.industries];
+            thresholdSlider.value = DEFAULT_CONFIG.threshold;
+            thresholdVal.textContent = DEFAULT_CONFIG.threshold;
+            hcoSlider.value = DEFAULT_CONFIG.hcoBonus;
+            hcoVal.textContent = DEFAULT_CONFIG.hcoBonus;
+            renderTags();
+            log('System Reset Complete.', '#ff4444');
+        }
     });
 
     document.getElementById('run-now-btn').addEventListener('click', async () => {
@@ -119,21 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (token) await triggerWorkflow(token);
     });
 
-    document.getElementById('reset-settings-btn').addEventListener('click', () => {
-        if (confirm('Reset to factory defaults?')) {
-            industries = [...DEFAULT_CONFIG.industries];
-            thresholdSlider.value = DEFAULT_CONFIG.threshold;
-            renderTags();
-            log('System Reset Complete.', '#ff4444');
-        }
-    });
-
-    thresholdSlider.addEventListener('input', (e) => thresholdVal.textContent = e.target.value);
-    hcoSlider.addEventListener('input', (e) => hcoVal.textContent = e.target.value);
-    industryInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && industryInput.value.trim() !== '') {
-            industries.push(industryInput.value.trim()); industryInput.value = ''; renderTags();
-        }
+    // Sidebar Navigation (Smooth Scroll)
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(ni => ni.classList.remove('active'));
+            item.classList.add('active');
+            const targetId = item.getAttribute('data-target');
+            const targetEl = targetId === 'top' ? document.body : document.getElementById(targetId);
+            if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
     });
 
     renderTags();
