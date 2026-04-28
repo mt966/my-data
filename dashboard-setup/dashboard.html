@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCO Master Dashboard | Elite Lead Gen</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="logo">
+                <i class="fas fa-microscope"></i>
+                <span>HCO HUNTER</span>
+            </div>
+            <nav>
+                <div class="nav-item active"><i class="fas fa-th-large"></i> Overview</div>
+                <div class="nav-item"><i class="fas fa-bullseye"></i> Targeting</div>
+                <div class="nav-item"><i class="fas fa-vial"></i> Scoring Lab</div>
+                <div class="nav-item"><i class="fas fa-user-secret"></i> Stealth</div>
+                <div class="nav-item"><i class="fas fa-database"></i> Leads Data</div>
+                <div class="nav-item"><i class="fas fa-cog"></i> Sheet Sync</div>
+            </nav>
+
+            <div style="margin-top: auto; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.8rem; color: var(--text-dim);">
+                <p>System Version: 3.2.0 (Elite)</p>
+                <p>Last Sync: Just now</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <header>
+                <div>
+                    <h1 style="font-size: 1.8rem; margin-bottom: 5px;">Elite Control Center</h1>
+                    <p style="color: var(--text-dim);">Manage your A to Z Lead Generation Settings</p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="status-badge">
+                        <div class="pulse"></div>
+                        System Ready
+                    </div>
+                    <button class="btn btn-start" id="run-now-btn">
+                        <i class="fas fa-play"></i> START JOB NOW
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Targeting Section -->
+                <div class="card">
+                    <h3><i class="fas fa-industry" style="color: var(--primary);"></i> Targeting Hub</h3>
+                    <div class="input-group">
+                        <label>Target Industries (Comma separated)</label>
+                        <input type="text" id="industry-input" placeholder="e.g. Lubricants, Paints, Rubber">
+                        <div class="tag-container" id="industry-tags"></div>
+                    </div>
+                    <div class="input-group">
+                        <label>Target Countries</label>
+                        <select id="country-select" multiple style="height: 120px;">
+                            <option value="USA">USA</option>
+                            <option value="Germany">Germany</option>
+                            <option value="UAE">UAE</option>
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="UK">UK</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Turkey">Turkey</option>
+                        </select>
+                        <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 5px;">Hold Ctrl to select multiple</p>
+                    </div>
+                </div>
+
+                <!-- Scoring Section -->
+                <div class="card">
+                    <h3><i class="fas fa-chart-line" style="color: var(--secondary);"></i> Scoring Lab</h3>
+                    <div class="input-group">
+                        <label>Quality Threshold (Min Score: <span id="threshold-val">10</span>)</label>
+                        <input type="range" id="threshold-slider" min="5" max="50" value="10">
+                    </div>
+                    <div class="input-group">
+                        <label>HCO Word Bonus (+<span id="hco-val">25</span>)</label>
+                        <input type="range" id="hco-slider" min="10" max="100" value="25">
+                    </div>
+                    <div class="input-group">
+                        <label>Blacklist Keywords (Rejection List)</label>
+                        <textarea id="blacklist-input" rows="3" placeholder="indiamart, amazon, ebay..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Performance Section -->
+                <div class="card">
+                    <h3><i class="fas fa-tachometer-alt" style="color: #ffaa00;"></i> Stealth & Performance</h3>
+                    <div class="input-group">
+                        <label>Search Depth (Pages per query)</label>
+                        <select id="search-depth">
+                            <option value="1">1 Page (Fastest)</option>
+                            <option value="2" selected>2 Pages (Balanced)</option>
+                            <option value="5">5 Pages (Deep)</option>
+                            <option value="10">10 Pages (Extreme)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Scraper Depth (Sub-pages per site)</label>
+                        <input type="number" id="scraper-depth" value="5" min="1" max="15">
+                    </div>
+                    <div class="input-group">
+                        <label>Stealth Delay (Seconds)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="delay-min" value="5" placeholder="Min">
+                            <input type="number" id="delay-max" value="10" placeholder="Max">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sync Section -->
+                <div class="card">
+                    <h3><i class="fas fa-cloud-upload-alt" style="color: #00ff88;"></i> Sheet Sync</h3>
+                    <div class="input-group">
+                        <label>Google Sheet Webhook URL</label>
+                        <input type="password" id="webhook-url" placeholder="Paste your webhook URL here">
+                    </div>
+                    <div class="input-group">
+                        <label>Contact Discovery Keywords</label>
+                        <input type="text" id="contact-keywords" value="contact, about, enquiry, sales">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" id="save-settings-btn">
+                        <i class="fas fa-save"></i> SAVE ALL SETTINGS
+                    </button>
+                    <button class="btn" style="width: 100%; margin-top: 10px; background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid rgba(255,0,0,0.2);" id="reset-settings-btn">
+                        <i class="fas fa-undo"></i> RESET TO DEFAULT
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal/Logs Section -->
+            <div class="card" style="margin-top: 2rem; background: #000;">
+                <h3 style="color: #00ff88; font-family: monospace;"><i class="fas fa-terminal"></i> Live Job Execution Logs</h3>
+                <div id="terminal" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #aaa; line-height: 1.6;">
+                    <p>> System initialized...</p>
+                    <p>> Dashboard connected to Lead Gen Engine v3.2</p>
+                    <p>> Ready for instruction.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

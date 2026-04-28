@@ -1,8 +1,10 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createObjectCsvWriter } from 'csv-writer';
-import path from 'path';
 import fs from 'fs';
+
+// Load Centralized Config
+const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
 const CSV_PATH = './international_industry_leads.csv';
 const LEADS_JSON_PATH = './potential_leads.json';
@@ -41,72 +43,56 @@ async function probeDeep(homepageUrl) {
       if (href && href.toLowerCase().startsWith('mailto:')) emails.add(href.replace(/^mailto:/i, '').split('?')[0].trim());
     });
 
-    // Sub-page Discovery
     const subLinks = [];
-    const targetKeywords = ['contact', 'about', 'enquiry', 'rfq', 'sales', 'location', 'kontakt', 'contacto'];
     $('a').each((i, el) => {
       const href = $(el).attr('href');
-      if (href && targetKeywords.some(kw => $(el).text().toLowerCase().includes(kw))) {
+      if (href && config.discovery.contact_keywords.some(kw => $(el).text().toLowerCase().includes(kw))) {
         try { subLinks.push(new URL(href, homepageUrl).href); } catch {}
       }
     });
 
-    for (const sub of [...new Set(subLinks)].slice(0, 5)) {
+    for (const sub of [...new Set(subLinks)].slice(0, config.performance.scraper_depth)) {
       try {
         const sRes = await axios.get(sub, { timeout: 10000, headers: { 'User-Agent': 'Mozilla/5.0' }, validateStatus: false });
         if (sRes.status < 400) (sRes.data.match(EMAIL_REGEX) || []).forEach(e => emails.add(e));
       } catch {}
     }
 
-    const cleanEmails = [...emails].filter(e => !/\.(png|jpg|js|css|pdf)$/i.test(e) && e.length < 50);
-    const cleanPhones = [...phones].filter(p => p.length >= 8 && p.length <= 15);
-    
     let siteName = $('meta[property="og:site_name"]').attr('content') || $('title').text().split(/[-|:|—]/)[0].trim();
-    return { emails: cleanEmails, phones: cleanPhones, siteName };
+    return { emails: [...emails].filter(e => e.length < 50), phones: [...phones], siteName };
   } catch { return { emails: [], phones: [], siteName: null }; }
 }
 
 async function runLeadProcessor() {
-  console.log('🚀 PROCESSING HIGH-INTENT HCO LEADS...');
+  console.log('🚀 PROCESSING CONFIG-DRIVEN HCO LEADS...');
   if (!fs.existsSync(LEADS_JSON_PATH)) return;
 
   const leads = JSON.parse(fs.readFileSync(LEADS_JSON_PATH, 'utf8'));
-  
-  // ULTRA-SORT: Highest Score First (The 100% Relevant Leads)
   const sortedLeads = leads.sort((a, b) => b.score - a.score);
   
   let globalScraped = new Set();
   if (fs.existsSync(SCRAPED_DOMAINS_PATH)) {
-    globalScraped = new Set(JSON.parse(fs.readFileSync(SCRAPED_DOMAINS_PATH, 'utf8')));
+    try { globalScraped = new Set(JSON.parse(fs.readFileSync(SCRAPED_DOMAINS_PATH, 'utf8'))); } catch(e) {}
   }
 
   for (const lead of sortedLeads) {
     if (globalScraped.has(lead.website)) continue;
-
-    console.log(`🔍 Probing Elite Lead [Score ${lead.score}]: ${lead.website}`);
+    console.log(`🔍 Probing [Score ${lead.score}]: ${lead.website}`);
     const { emails, phones, siteName } = await probeDeep(lead.website);
 
     if (emails.length > 0 || phones.length > 0) {
-      let finalName = siteName || lead.name;
-      if (finalName.length < 3 || /home|welcome|index/i.test(finalName)) {
-         finalName = new URL(lead.website).hostname.replace(/^www\./, '').split('.')[0].toUpperCase();
-      }
-
       await csvWriter.writeRecords([{
-        name: `'${finalName}`,
+        name: siteName || lead.name,
         country: lead.country,
-        email: `'${emails.slice(0, 3).join('; ')}`,
-        phone: `'${phones.slice(0, 2).join('; ')}`,
+        email: emails.slice(0, 3).join('; '),
+        phone: phones.slice(0, 2).join('; '),
         industry: lead.industry,
         website: lead.website,
         score: lead.score
       }]);
-      console.log(`   ✅ Details Saved for ${finalName}`);
     }
-
     globalScraped.add(lead.website);
     fs.writeFileSync(SCRAPED_DOMAINS_PATH, JSON.stringify([...globalScraped], null, 2));
-    await new Promise(r => setTimeout(r, 2000));
   }
 }
 

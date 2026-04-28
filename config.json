@@ -1,0 +1,49 @@
+{
+  "targeting": {
+    "industries": [
+      {
+        "category": "🥇 High Bulk (Tier 1)",
+        "items": ["Lubricants & Grease", "Paints & Coatings", "Plastics & Polymer"]
+      },
+      {
+        "category": "🥈 Medium to High Bulk (Tier 2)",
+        "items": ["Adhesives & Sealants", "Printing Ink", "Wax & Candle", "Rubber"]
+      },
+      {
+        "category": "🥉 Medium Bulk (Tier 3)",
+        "items": ["Cosmetics & Personal Care", "Textile Processing", "Leather Processing", "Paper & Packaging"]
+      },
+      {
+        "category": "🧪 Specialized Chemicals",
+        "items": ["Pharmaceutical", "Construction Chemicals", "Agriculture Chemicals", "Electrical Insulation"]
+      }
+    ],
+    "countries": ["USA", "Germany", "UAE", "Vietnam", "UK", "Singapore", "China", "Italy", "France", "Japan", "South Korea", "Turkey", "Brazil", "Russia", "Thailand", "Malaysia", "Netherlands", "Belgium", "Spain", "Poland"]
+  },
+  "scoring": {
+    "threshold": 10,
+    "hco_bonus": 25,
+    "industry_match": 15,
+    "factory_signal": 8,
+    "intent_signal": 10,
+    "blacklist": ["indiamart", "tradeindia", "amazon", "ebay", "alibaba", "wikipedia", "facebook", "news"]
+  },
+  "performance": {
+    "search_pages": 2,
+    "scraper_depth": 5,
+    "delay_min": 5,
+    "delay_max": 10,
+    "max_run_time_mins": 200
+  },
+  "discovery": {
+    "contact_keywords": ["contact", "about", "enquiry", "rfq", "sales", "location", "kontakt", "contacto"],
+    "search_queries": [
+      "manufacturer bulk raw material procurement sourcing",
+      "manufacturing plant purchasing manager contact",
+      "factory production facility material buyer",
+      "importer bulk buyer procurement lead",
+      "chemicals sourcing manager contact",
+      "wholesale industrial material purchasing"
+    ]
+  }
+}
