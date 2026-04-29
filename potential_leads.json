@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "name": "Types of Glue and Adhesives",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=c34abcacb6e4249ed759985658c4e7eb9652ad3506a6ac1cf4db39bb40484facJmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cuaG9tZWRlcG90LmNvbS9jL2FiL3R5cGVzLW9mLWdsdWUtYW5kLWFkaGVzaXZlcy85YmE2ODM2MDNiZTlmYTUzOTVmYWI5MDFlZWQ1NWRmNw&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "Adhesive",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=aaa7d617f3375747fbea9e0750fbd8615e40f06cb4d88c64bfce00d6dcb3eb77JmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvQWRoZXNpdmU&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "APPLIED Adhesives",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=08b5da6ac50bb6fb64042c9658ea1e2a05383ec7df16519a4ea64890c14fbea0JmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cuYXBwbGllZGFkaGVzaXZlcy5jb20v&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "3M Adhesives, Sealants & Fillers",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=ab03e79d1e6dfcddbba5ff3f9bbdf0f7a6ca27debbe1d9d717fd3335b92a99afJmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cuM20uY29tLzNNL2VuX1VTL3AvYy9hZGhlc2l2ZXMv&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "Amazon.com",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=d2d93026d940d00bdbf6fbc96159def3d35e926cef3ee80d79fbb4591eaf4d61JmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cuYW1hem9uLmNvbS9hZGhlc2l2ZXMvcz9rPWFkaGVzaXZlcw&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "Adhesives",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=46ca3141c970de2554a78c4973c94726da40b13ebdbb37e874e1084df630e2f3JmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cubWNtYXN0ZXIuY29tL3Byb2R1Y3RzL2FkaGVzaXZlcw&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "Glue and Construction Adhesive Buying Guide",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=43db74b539a8b2e2cf8549d126f1868125db5eadbc43f307e202a13ee6aa90b4JmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cubG93ZXMuY29tL24vYnV5aW5nLWd1aWRlL2dsdWUtYWRoZXNpdmUtYnV5aW5nLWd1aWRlP21zb2NraWQ9MmYxMjNjN2QxZmFmNjExNjA2ZmUyYjM0MWVjNDYwMzc&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "Home",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=305b4a375bbfb1ba6e89d70194adf781e23eeec1d050c4f921822f3b4b4ed0bfJmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly9hZGhlc2l2ZXMub3JnLw&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  },
+  {
+    "name": "15 Types of Glue and Adhesives Every Homeowner Should Know",
+    "country": "Germany",
+    "website": "https://www.bing.com/ck/a?!&&p=b6f89901305cbd4ebe736cbf830fe7d087de56d369a2f8f4cf5e3db3faf7787aJmltdHM9MTc3NzMzNDQwMA&ptn=3&ver=2&hsh=4&fclid=2f123c7d-1faf-6116-06fe-2b341ec46037&u=a1aHR0cHM6Ly93d3cuYm9idmlsYS5jb20vYXJ0aWNsZXMvdHlwZXMtb2YtZ2x1ZS8&ntb=1",
+    "industry": "Adhesives & Sealants",
+    "score": 15
+  }
+]
